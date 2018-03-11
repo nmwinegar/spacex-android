@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.launch.LaunchDetailActivity"
+            android:name=".ui.launch.launchDetail.LaunchDetailActivity"
             android:label="@string/title_launch_detail"
             android:parentActivityName=".ui.launch.LaunchListActivity"
             android:theme="@style/AppTheme.NoActionBar">

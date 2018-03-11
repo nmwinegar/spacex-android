@@ -11,10 +11,9 @@ import com.bumptech.glide.Glide;
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.SpaceXDemoApp;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
-import com.nickwinegar.spacexdemo.model.Launch;
+import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailActivity;
 
 import java.util.Collections;
-import java.util.Comparator;
 
 import javax.inject.Inject;
 
@@ -31,12 +30,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class LaunchListActivity extends AppCompatActivity {
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
-    private boolean isTwoPane;
-
     @Inject
     SpaceXService spaceXService;
 
@@ -50,14 +43,6 @@ public class LaunchListActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-
-        if (findViewById(R.id.launch_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
-            isTwoPane = true;
-        }
 
         RecyclerView recyclerView = findViewById(R.id.launch_list);
         assert recyclerView != null;
@@ -75,7 +60,7 @@ public class LaunchListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new LaunchesAdapter(Glide.with(this), isTwoPane));
+        recyclerView.setAdapter(new LaunchesAdapter(Glide.with(this)));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
 }

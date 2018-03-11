@@ -27,7 +27,7 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
     private final RequestManager glide;
     private List<Launch> launches;
 
-    LaunchesAdapter(RequestManager glide, boolean isTwoPane) {
+    LaunchesAdapter(RequestManager glide) {
         this.glide = glide;
     }
 
