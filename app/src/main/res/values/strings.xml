@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SpaceX Demo</string>
+    <string name="title_launch_detail">Launch Detail</string>
+    <string name="mission_patch_description">Mission Patch</string>
+</resources>
