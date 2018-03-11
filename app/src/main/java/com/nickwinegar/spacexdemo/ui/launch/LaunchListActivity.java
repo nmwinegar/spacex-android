@@ -1,5 +1,6 @@
 package com.nickwinegar.spacexdemo.ui.launch;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,16 +10,10 @@ import android.support.v7.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.nickwinegar.spacexdemo.R;
-import com.nickwinegar.spacexdemo.SpaceXDemoApp;
-import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailActivity;
 
-import java.util.Collections;
-
-import javax.inject.Inject;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * An activity representing a list of Launches. This activity
@@ -30,37 +25,32 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class LaunchListActivity extends AppCompatActivity {
 
-    @Inject
-    SpaceXService spaceXService;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.launch_list)
+    RecyclerView launchList;
+
+    private LaunchesAdapter launchListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((SpaceXDemoApp)getApplication()).appComponent.inject(this);
+        LaunchListViewModel viewModel = ViewModelProviders.of(this).get(LaunchListViewModel.class);
 
         setContentView(R.layout.activity_launch_list);
+        ButterKnife.bind(this);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        setupRecyclerView(launchList);
 
-        RecyclerView recyclerView = findViewById(R.id.launch_list);
-        assert recyclerView != null;
-        setupRecyclerView(recyclerView);
-
-        spaceXService.getLaunches()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(launches -> {
-                    // Sort launches from most recent to oldest
-                    Collections.sort(launches, (launch1, launch2) -> Long.compare(launch2.launchDateTimestamp, launch1.launchDateTimestamp));
-                    LaunchesAdapter adapter = (LaunchesAdapter) recyclerView.getAdapter();
-                    adapter.setLaunches(launches);
-                });
+        viewModel.getLaunches()
+                .observe(this, launches -> launchListAdapter.setLaunches(launches));
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new LaunchesAdapter(Glide.with(this)));
+        launchListAdapter = new LaunchesAdapter(Glide.with(this));
+        recyclerView.setAdapter(launchListAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
 }
