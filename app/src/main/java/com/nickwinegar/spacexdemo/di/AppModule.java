@@ -27,8 +27,8 @@ public class AppModule {
     }
 
     @Singleton @Provides
-    ConnectionService provideConnectionService() {
-        return new ConnectionService(spaceXDemoApp);
+    ConnectionService provideConnectionService(SpaceXDemoApp spaceXApp) {
+        return new ConnectionService(spaceXApp);
     }
 
     @Singleton @Provides
