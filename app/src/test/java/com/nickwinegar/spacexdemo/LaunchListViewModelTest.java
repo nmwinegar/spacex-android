@@ -2,6 +2,7 @@ package com.nickwinegar.spacexdemo;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.Observer;
+import android.support.annotation.NonNull;
 
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.di.AppComponent;
@@ -68,40 +69,55 @@ public class LaunchListViewModelTest {
 
     @Test
     public void launchListViewModel_LaunchesReturnedByApiOnSuccess() {
+        // Given the device is connected and Space X API call succeeds
+        List<Launch> testLaunches = getTestLaunches();
         when(mockConnectionService.isConnected()).thenReturn(true);
-        Launch testLaunch = new Launch();
-        testLaunch.flightNumber = 999;
-        testLaunch.launchDateTimestamp = new Date().getTime();
-        List<Launch> testLaunches = new ArrayList<>();
-        testLaunches.add(testLaunch);
         when(mockSpaceXService.getLaunches()).thenReturn(Observable.just(testLaunches));
         viewModel.getLaunches().observeForever(launchObserver);
         viewModel.getErrorMessage().observeForever(errorObserver);
 
+        // when launches are requested from the VM
         viewModel.getLaunches();
 
+        // launch observers should be notified on change, and no error should occur
         verify(errorObserver, never()).onChanged(any());
         verify(launchObserver, atLeastOnce()).onChanged(testLaunches);
     }
 
     @Test
     public void launchListViewModel_ErrorMessageWhenNotConnected() {
+        // Given the device does not have an available network connection
         when(mockConnectionService.isConnected()).thenReturn(false);
         viewModel.getErrorMessage().observeForever(errorObserver);
 
+        // When launches are requested from the VM
         viewModel.getLaunches();
 
+        // An error notification should be sent
         verify(errorObserver).onChanged("Unable to get launches, network is unavailable.");
     }
 
     @Test
     public void launchListViewModel_ErrorMessageWhenApiCallFails() {
+        // Given the device is connected but the Space X api call fails
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunches()).thenReturn(Observable.error(new Exception("Test Exception")));
         viewModel.getErrorMessage().observeForever(errorObserver);
 
+        // When launches are requested from the VM
         viewModel.getLaunches();
 
+        // An error notification should be sent
         verify(errorObserver).onChanged("Error retrieving launch information.");
+    }
+
+    @NonNull
+    private List<Launch> getTestLaunches() {
+        Launch testLaunch = new Launch();
+        testLaunch.flightNumber = 999;
+        testLaunch.launchDateTimestamp = new Date().getTime();
+        List<Launch> testLaunches = new ArrayList<>();
+        testLaunches.add(testLaunch);
+        return testLaunches;
     }
 }
