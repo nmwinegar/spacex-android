@@ -8,7 +8,7 @@ import com.nickwinegar.spacexdemo.di.DaggerAppComponent;
 
 public class SpaceXDemoApp extends Application {
 
-    public AppComponent appComponent;
+    private AppComponent appComponent;
 
     @Override
     public void onCreate() {
@@ -18,5 +18,9 @@ public class SpaceXDemoApp extends Application {
                 .appModule(new AppModule(this))
                 .build();
         appComponent.inject(this);
+    }
+
+    public AppComponent getAppComponent() {
+        return appComponent;
     }
 }

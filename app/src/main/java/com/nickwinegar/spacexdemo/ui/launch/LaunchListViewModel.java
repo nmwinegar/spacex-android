@@ -24,21 +24,22 @@ import io.reactivex.schedulers.Schedulers;
 public class LaunchListViewModel extends AndroidViewModel {
 
     @Inject
+    public
     SpaceXService spaceXService;
     @Inject
-    ConnectionService connectionService;
+    public ConnectionService connectionService;
 
     private final MutableLiveData<List<Launch>> launches;
     private SingleLiveEvent<String> errorMessage;
 
     public LaunchListViewModel(@NonNull Application application) {
         super(application);
-        ((SpaceXDemoApp) application).appComponent.inject(this);
+        ((SpaceXDemoApp) application).getAppComponent().inject(this);
         launches = new MutableLiveData<>();
         errorMessage = new SingleLiveEvent<>();
     }
 
-    LiveData<List<Launch>> getLaunches() {
+    public LiveData<List<Launch>> getLaunches() {
         if (!connectionService.isConnected()) {
             errorMessage.setValue("Unable to get launches, network is unavailable.");
             return launches;
@@ -56,7 +57,7 @@ public class LaunchListViewModel extends AndroidViewModel {
         return launches;
     }
 
-    SingleLiveEvent<String> getErrorMessage() {
+    public SingleLiveEvent<String> getErrorMessage() {
         return errorMessage;
     }
 }
