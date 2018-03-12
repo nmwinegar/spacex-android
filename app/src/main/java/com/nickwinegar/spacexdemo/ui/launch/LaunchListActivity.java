@@ -3,6 +3,7 @@ package com.nickwinegar.spacexdemo.ui.launch;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +47,12 @@ public class LaunchListActivity extends AppCompatActivity {
 
         viewModel.getLaunches()
                 .observe(this, launches -> launchListAdapter.setLaunches(launches));
+        viewModel.getErrorMessage()
+                .observe(this, error -> {
+                    if (error != null) {
+                        Snackbar.make(launchList, error, Snackbar.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {

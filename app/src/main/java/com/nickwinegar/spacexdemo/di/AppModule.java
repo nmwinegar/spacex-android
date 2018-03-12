@@ -21,6 +21,11 @@ public class AppModule {
     }
 
     @Singleton @Provides
+    SpaceXDemoApp providesApplication() {
+        return spaceXDemoApp;
+    }
+
+    @Singleton @Provides
     SpaceXService provideSpaceXService() {
         return new Retrofit.Builder()
                 .baseUrl("https://api.spacexdata.com/v2/")
