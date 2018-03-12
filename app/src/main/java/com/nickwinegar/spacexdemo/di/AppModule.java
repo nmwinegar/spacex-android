@@ -2,6 +2,7 @@ package com.nickwinegar.spacexdemo.di;
 
 import com.nickwinegar.spacexdemo.SpaceXDemoApp;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
+import com.nickwinegar.spacexdemo.util.ConnectionService;
 
 import javax.inject.Singleton;
 
@@ -23,6 +24,11 @@ public class AppModule {
     @Singleton @Provides
     SpaceXDemoApp providesApplication() {
         return spaceXDemoApp;
+    }
+
+    @Singleton @Provides
+    ConnectionService provideConnectionService() {
+        return new ConnectionService(spaceXDemoApp);
     }
 
     @Singleton @Provides

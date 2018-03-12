@@ -4,14 +4,12 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 
 import com.nickwinegar.spacexdemo.SpaceXDemoApp;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.model.Launch;
+import com.nickwinegar.spacexdemo.util.ConnectionService;
 import com.nickwinegar.spacexdemo.util.SingleLiveEvent;
 
 import java.util.Collections;
@@ -27,6 +25,8 @@ public class LaunchListViewModel extends AndroidViewModel {
 
     @Inject
     SpaceXService spaceXService;
+    @Inject
+    ConnectionService connectionService;
 
     private final MutableLiveData<List<Launch>> launches;
     private SingleLiveEvent<String> errorMessage;
@@ -39,7 +39,7 @@ public class LaunchListViewModel extends AndroidViewModel {
     }
 
     LiveData<List<Launch>> getLaunches() {
-        if (!networkIsAvailable()) {
+        if (!connectionService.isConnected()) {
             errorMessage.setValue("Unable to get launches, network is unavailable.");
             return launches;
         }
@@ -51,21 +51,12 @@ public class LaunchListViewModel extends AndroidViewModel {
                     // Sort launches from most recent to oldest
                     Collections.sort(launches, (launch1, launch2) -> Long.compare(launch2.launchDateTimestamp, launch1.launchDateTimestamp));
                     this.launches.setValue(launches);
-                }, error -> {
-                    errorMessage.setValue("Error retrieving launch information.");
-                });
+                }, error -> errorMessage.setValue("Error retrieving launch information."));
 
         return launches;
     }
 
     SingleLiveEvent<String> getErrorMessage() {
         return errorMessage;
-    }
-
-    private boolean networkIsAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 }
