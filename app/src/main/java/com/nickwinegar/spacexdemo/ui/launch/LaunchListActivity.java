@@ -11,18 +11,13 @@ import android.support.v7.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.nickwinegar.spacexdemo.R;
-import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * An activity representing a list of Launches. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link LaunchDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
+ * An activity representing a list of SpaceX Launches. Launches display as either
+ * an upcoming launch, or a previous launch. Selecting a launch navigates to detail view
  */
 public class LaunchListActivity extends AppCompatActivity {
 
