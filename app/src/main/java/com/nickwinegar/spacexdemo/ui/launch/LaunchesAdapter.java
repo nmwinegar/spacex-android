@@ -25,10 +25,19 @@ import butterknife.ButterKnife;
 
 public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHolder> {
     private final RequestManager glide;
+    private LaunchSelectedCallback launchSelectedCallback;
     private List<Launch> launches;
 
-    LaunchesAdapter(RequestManager glide) {
+    private View.OnClickListener launchSelectedListener = view -> {
+        if (launchSelectedCallback != null) {
+            Launch launch = (Launch) view.getTag();
+            launchSelectedCallback.onLaunchSelected(launch);
+        }
+    };
+
+    LaunchesAdapter(RequestManager glide, LaunchSelectedCallback launchSelectedCallback) {
         this.glide = glide;
+        this.launchSelectedCallback = launchSelectedCallback;
     }
 
     // TODO Diff incoming launches to only update what is needed
@@ -52,6 +61,8 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Launch launch = launches.get(position);
 
+        holder.itemView.setTag(launch);
+        holder.itemView.setOnClickListener(launchSelectedListener);
         glide.load(launch.links.patchUrl)
                 .into(holder.patchView);
         Date launchTime = new Date(launch.launchDateTimestamp * 1000);
