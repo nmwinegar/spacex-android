@@ -1,14 +1,21 @@
 package com.nickwinegar.spacexdemo.ui.launch.launchDetail;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.ui.launch.LaunchListActivity;
+import com.nickwinegar.spacexdemo.util.GlideApp;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * An activity representing a single Launch detail screen. This
@@ -17,12 +24,25 @@ import com.nickwinegar.spacexdemo.ui.launch.LaunchListActivity;
  * in a {@link LaunchListActivity}.
  */
 public class LaunchDetailActivity extends AppCompatActivity {
+    public static final String ARG_ITEM_ID = "item_id";
+    @BindView(R.id.detail_toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.toolbar_layout)
+    CollapsingToolbarLayout collapsingToolbar;
+    @BindView(R.id.launch_highlight_image)
+    ImageView highlightImageView;
+
+    private LaunchDetailViewModel viewModel;
+    private int launchFlightNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = ViewModelProviders.of(this).get(LaunchDetailViewModel.class);
+
         setContentView(R.layout.activity_launch_detail);
-        Toolbar toolbar = findViewById(R.id.detail_toolbar);
+        ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
 
         // Show the Up button in the action bar.
@@ -31,27 +51,22 @@ public class LaunchDetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // savedInstanceState is non-null when there is fragment state
-        // saved from previous configurations of this activity
-        // (e.g. when rotating the screen from portrait to landscape).
-        // In this case, the fragment will automatically be re-added
-        // to its container so we don't need to manually add it.
-        // For more information, see the Fragments API guide at:
-        //
-        // http://developer.android.com/guide/components/fragments.html
-        //
-        if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putString(LaunchDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(LaunchDetailFragment.ARG_ITEM_ID));
-            LaunchDetailFragment fragment = new LaunchDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.launch_detail_container, fragment)
-                    .commit();
-        }
+        launchFlightNumber = getIntent().getIntExtra(ARG_ITEM_ID, 0);
+        setupUi();
+    }
+
+    private void setupUi() {
+        viewModel.getLaunch(launchFlightNumber)
+                .observe(this, launch -> {
+                    if (launch == null) return;
+                    collapsingToolbar.setTitle(launch.rocket.name);
+                    if (!launch.links.highlightImageUrl.isEmpty()) {
+                        GlideApp.with(this)
+                                .load(launch.links.highlightImageUrl)
+                                .centerCrop()
+                                .into(highlightImageView);
+                    }
+                });
     }
 
     @Override

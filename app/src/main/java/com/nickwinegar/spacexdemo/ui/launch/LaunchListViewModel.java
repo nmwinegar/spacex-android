@@ -24,8 +24,7 @@ import io.reactivex.schedulers.Schedulers;
 public class LaunchListViewModel extends AndroidViewModel {
 
     @Inject
-    public
-    SpaceXService spaceXService;
+    public SpaceXService spaceXService;
     @Inject
     public ConnectionService connectionService;
 

@@ -13,5 +13,9 @@ public class Launch {
     public class LaunchLinks {
         @SerializedName("mission_patch")
         public String patchUrl;
+        @SerializedName("video_link")
+        public String videoUrl;
+
+        public String highlightImageUrl;
     }
 }

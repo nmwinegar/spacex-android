@@ -11,10 +11,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
-import com.bumptech.glide.Glide;
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailActivity;
-import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailFragment;
+import com.nickwinegar.spacexdemo.util.GlideApp;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,7 +54,7 @@ public class LaunchListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        launchListAdapter = new LaunchesAdapter(Glide.with(this), callback);
+        launchListAdapter = new LaunchesAdapter(GlideApp.with(this), callback);
         recyclerView.setAdapter(launchListAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
@@ -63,7 +62,7 @@ public class LaunchListActivity extends AppCompatActivity {
     private final LaunchSelectedCallback callback = launch -> {
         if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
             Intent intent = new Intent(this, LaunchDetailActivity.class);
-            intent.putExtra(LaunchDetailFragment.ARG_ITEM_ID, launch.flightNumber);
+            intent.putExtra(LaunchDetailActivity.ARG_ITEM_ID, launch.flightNumber);
             startActivity(intent);
         }
     };
