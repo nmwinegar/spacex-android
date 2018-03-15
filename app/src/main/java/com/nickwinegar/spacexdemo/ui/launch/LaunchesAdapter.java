@@ -66,7 +66,7 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
         glide.load(launch.links.patchUrl)
                 .into(holder.patchView);
         Date launchTime = new Date(launch.launchDateTimestamp * 1000);
-        holder.launchTime.setText(new SimpleDateFormat("MMMM d y, h:mm aaa", Locale.getDefault()).format(launchTime));
+        holder.launchTime.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
         holder.rocketName.setText(launch.rocket.name);
         String payloadDescription = getPayloadDescription(launch);
         holder.payloadDescription.setText(payloadDescription);

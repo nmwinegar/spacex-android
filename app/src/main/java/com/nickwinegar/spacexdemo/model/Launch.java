@@ -12,6 +12,8 @@ public class Launch {
     public long launchDateTimestamp;
     @SerializedName("launch_success")
     public boolean launchSuccess;
+    @SerializedName("launch_site")
+    public LaunchSite launchSite;
 
     public class LaunchLinks {
         @SerializedName("mission_patch")

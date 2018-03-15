@@ -1,18 +1,27 @@
 package com.nickwinegar.spacexdemo.ui.launch.launchDetail;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.nickwinegar.spacexdemo.R;
+import com.nickwinegar.spacexdemo.model.Launch;
 import com.nickwinegar.spacexdemo.ui.launch.LaunchListActivity;
 import com.nickwinegar.spacexdemo.util.GlideApp;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,8 +38,14 @@ public class LaunchDetailActivity extends AppCompatActivity {
     Toolbar toolbar;
     @BindView(R.id.toolbar_layout)
     CollapsingToolbarLayout collapsingToolbar;
+    @BindView(R.id.play_video_fab)
+    FloatingActionButton playVideoFab;
     @BindView(R.id.launch_highlight_image)
     ImageView highlightImageView;
+    @BindView(R.id.detail_header_textview)
+    TextView launchDetailHeader;
+    @BindView(R.id.launch_site_name)
+    TextView launchSiteDescription;
 
     private LaunchDetailViewModel viewModel;
     private int launchFlightNumber;
@@ -49,24 +64,36 @@ public class LaunchDetailActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
+        playVideoFab.setOnClickListener(arg -> playHighlightVideo());
 
         launchFlightNumber = getIntent().getIntExtra(ARG_ITEM_ID, 0);
-        setupUi();
+        viewModel.getLaunch(launchFlightNumber)
+                .observe(this, this::setupUi);
     }
 
-    private void setupUi() {
-        viewModel.getLaunch(launchFlightNumber)
-                .observe(this, launch -> {
-                    if (launch == null) return;
-                    collapsingToolbar.setTitle(launch.rocket.name);
-                    if (!launch.links.highlightImageUrl.isEmpty()) {
-                        GlideApp.with(this)
-                                .load(launch.links.highlightImageUrl)
-                                .centerCrop()
-                                .into(highlightImageView);
-                    }
-                });
+    private void setupUi(Launch launch) {
+        if (launch == null) return;
+        if (!launch.links.highlightImageUrl.isEmpty()) {
+            GlideApp.with(this)
+                    .load(launch.links.highlightImageUrl)
+                    .centerCrop()
+                    .into(highlightImageView);
+        }
+        Date launchTime = new Date(launch.launchDateTimestamp * 1000);
+        launchDetailHeader.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
+        launchSiteDescription.setText(launch.launchSite.name);
+    }
+
+    private void playHighlightVideo() {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoAppUri());
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoWebUri());
+        try {
+            startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            startActivity(webIntent);
+        }
     }
 
     @Override

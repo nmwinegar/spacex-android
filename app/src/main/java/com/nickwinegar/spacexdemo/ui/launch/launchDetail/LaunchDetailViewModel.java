@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.net.Uri;
 import android.net.UrlQuerySanitizer;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -30,12 +31,11 @@ public class LaunchDetailViewModel extends AndroidViewModel {
 
     public LaunchDetailViewModel(@NonNull Application application) {
         super(application);
-        ((SpaceXDemoApp)application).getAppComponent().inject(this);
+        ((SpaceXDemoApp) application).getAppComponent().inject(this);
 
         launch = new MutableLiveData<>();
         errorMessage = new SingleLiveEvent<>();
     }
-
 
     LiveData<Launch> getLaunch(int flightNumber) {
         if (!connectionService.isConnected()) {
@@ -54,11 +54,11 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                         if (!videoUrl.isEmpty() && videoUrl.contains("www.youtube.com")) {
                             UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(videoUrl);
                             String videoId = sanitizer.getValue("v");
-                            newLaunch.links.highlightImageUrl = String.format("https://i.ytimg.com/vi/%s/sddefault.jpg", videoId);
+                            newLaunch.links.highlightImageUrl = String.format("https://i.ytimg.com/vi/%s/hqdefault.jpg", videoId);
                         }
                         launch.setValue(newLaunch);
-                    }
-                    else errorMessage.setValue("More than one launch found for that flight number");
+                    } else
+                        errorMessage.setValue("More than one launch found for that flight number");
                 }, error -> {
                     Log.e("SpaceX", error.getMessage());
                     errorMessage.setValue("Error retrieving launch information.");
@@ -69,5 +69,27 @@ public class LaunchDetailViewModel extends AndroidViewModel {
 
     public SingleLiveEvent<String> getErrorMessage() {
         return errorMessage;
+    }
+
+    Uri getVideoWebUri() {
+        if (launch.getValue() != null) {
+            if (!launch.getValue().links.videoUrl.isEmpty() && launch.getValue().links.videoUrl.contains("www.youtube.com")) {
+                UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(launch.getValue().links.videoUrl);
+                String videoId = sanitizer.getValue("v");
+                return Uri.parse("http://www.youtube.com/watch?v=" + videoId);
+            }
+        }
+        return Uri.EMPTY;
+    }
+
+    Uri getVideoAppUri() {
+        if (launch.getValue() != null) {
+            if (!launch.getValue().links.videoUrl.isEmpty() && launch.getValue().links.videoUrl.contains("www.youtube.com")) {
+                UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(launch.getValue().links.videoUrl);
+                String videoId = sanitizer.getValue("v");
+                return Uri.parse("vnd.youtube:" + videoId);
+            }
+        }
+        return Uri.EMPTY;
     }
 }
