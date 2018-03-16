@@ -1,5 +1,6 @@
 package com.nickwinegar.spacexdemo.ui.launch.launchDetail;
 
+import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -7,17 +8,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.model.Launch;
+import com.nickwinegar.spacexdemo.model.Launchpad;
 import com.nickwinegar.spacexdemo.ui.launch.LaunchListActivity;
 import com.nickwinegar.spacexdemo.util.GlideApp;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,13 +34,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * An activity representing a single Launch detail screen. This
- * activity is only used on narrow width devices. On tablet-size devices,
- * item details are presented side-by-side with a list of items
- * in a {@link LaunchListActivity}.
+ * An activity representing a single Launch detail screen.
+ * This view displays details around the launch as well as
+ * provide links for the user to view additional details
  */
 public class LaunchDetailActivity extends AppCompatActivity {
     public static final String ARG_ITEM_ID = "item_id";
+    @BindView(R.id.launch_detail)
+    LinearLayout launchDetailLayout;
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;
     @BindView(R.id.toolbar_layout)
@@ -44,7 +52,15 @@ public class LaunchDetailActivity extends AppCompatActivity {
     ImageView highlightImageView;
     @BindView(R.id.detail_header_textview)
     TextView launchDetailHeader;
-    @BindView(R.id.launch_site_name)
+    @BindView(R.id.launch_success_header)
+    TextView launchSuccessHeader;
+    @BindView(R.id.launch_description)
+    TextView launchDescription;
+    @BindView(R.id.location_layout)
+    View locationLayout;
+    @BindView(R.id.launch_site_location)
+    TextView launchSiteLocation;
+    @BindView(R.id.launch_site_full_name)
     TextView launchSiteDescription;
 
     private LaunchDetailViewModel viewModel;
@@ -67,13 +83,20 @@ public class LaunchDetailActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
         playVideoFab.setOnClickListener(arg -> playHighlightVideo());
+        locationLayout.setOnClickListener(arg -> viewLaunchsiteLocation());
 
         launchFlightNumber = getIntent().getIntExtra(ARG_ITEM_ID, 0);
         viewModel.getLaunch(launchFlightNumber)
-                .observe(this, this::setupUi);
+                .observe(this, launch -> {
+                    updateLaunchInformation(launch);
+                    if (launch != null) {
+                        viewModel.getLaunchpadDetails(launch.launchSite.id)
+                                .observe(this, this::updateLaunchpadInformation);
+                    }
+                });
     }
 
-    private void setupUi(Launch launch) {
+    private void updateLaunchInformation(Launch launch) {
         if (launch == null) return;
         if (!launch.links.highlightImageUrl.isEmpty()) {
             GlideApp.with(this)
@@ -83,16 +106,32 @@ public class LaunchDetailActivity extends AppCompatActivity {
         }
         Date launchTime = new Date(launch.launchDateTimestamp * 1000);
         launchDetailHeader.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
-        launchSiteDescription.setText(launch.launchSite.name);
+        String launchSuccessMessage = launch.launchSuccess ? "Mission Success" : "Mission Failure";
+        launchSuccessHeader.setText(launchSuccessMessage);
+        launchDescription.setText(launch.details);
+    }
+
+    private void updateLaunchpadInformation(Launchpad launchpad) {
+        launchSiteLocation.setText(String.format("%s, %s", launchpad.launchpadLocation.name, launchpad.launchpadLocation.region));
+        launchSiteDescription.setText(launchpad.fullName);
     }
 
     private void playHighlightVideo() {
-        Intent appIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoAppUri());
-        Intent webIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoWebUri());
         try {
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoAppUri());
             startActivity(appIntent);
         } catch (ActivityNotFoundException ex) {
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoWebUri());
             startActivity(webIntent);
+        }
+    }
+
+    private void viewLaunchsiteLocation() {
+        try {
+            Intent mapsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("geo:%f, %f", viewModel.getLaunchpadLatitude(), viewModel.getLaunchpadLongitude())));
+            startActivity(mapsIntent);
+        } catch (Exception e) {
+            Snackbar.make(launchDetailLayout, "Unable to open launchsite location", Snackbar.LENGTH_SHORT);
         }
     }
 

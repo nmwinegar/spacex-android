@@ -8,23 +8,65 @@
         android:id="@+id/detail_header_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="@dimen/text_margin"
         android:text="@string/launch_site_header"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#bdbdbd"/>
+    <TextView
+        android:id="@+id/launch_success_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/text_margin"
+        android:layout_marginStart="@dimen/text_margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
     <TextView
-        android:id="@+id/launch_site_name"
+        android:id="@+id/launch_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/text_margin"
+        android:layout_marginStart="@dimen/text_margin"
+        android:layout_marginRight="@dimen/text_margin"
+        android:layout_marginEnd="@dimen/text_margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+
+    <LinearLayout
+        android:id="@+id/location_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:drawableStart="@drawable/ic_location_on"
-        android:drawableLeft="@drawable/ic_location_on"
-        android:drawablePadding="@dimen/text_margin" />
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_marginStart="@dimen/text_margin"
+            android:contentDescription="@string/launch_site_description"
+            android:src="@drawable/ic_location_on"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/launch_site_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
+
+            <TextView
+                android:id="@+id/launch_site_full_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
