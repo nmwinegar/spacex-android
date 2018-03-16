@@ -1,6 +1,5 @@
 package com.nickwinegar.spacexdemo.ui.launch.launchDetail;
 
-import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -15,7 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nickwinegar.spacexdemo.R;
@@ -23,8 +22,6 @@ import com.nickwinegar.spacexdemo.model.Launch;
 import com.nickwinegar.spacexdemo.model.Launchpad;
 import com.nickwinegar.spacexdemo.ui.launch.LaunchListActivity;
 import com.nickwinegar.spacexdemo.util.GlideApp;
-
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,32 +36,22 @@ import butterknife.ButterKnife;
  * provide links for the user to view additional details
  */
 public class LaunchDetailActivity extends AppCompatActivity {
-    public static final String ARG_ITEM_ID = "item_id";
-    @BindView(R.id.launch_detail)
-    LinearLayout launchDetailLayout;
-    @BindView(R.id.detail_toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.toolbar_layout)
-    CollapsingToolbarLayout collapsingToolbar;
-    @BindView(R.id.play_video_fab)
-    FloatingActionButton playVideoFab;
-    @BindView(R.id.launch_highlight_image)
-    ImageView highlightImageView;
-    @BindView(R.id.detail_header_textview)
-    TextView launchDetailHeader;
-    @BindView(R.id.launch_success_header)
-    TextView launchSuccessHeader;
-    @BindView(R.id.launch_description)
-    TextView launchDescription;
-    @BindView(R.id.location_layout)
-    View locationLayout;
-    @BindView(R.id.launch_site_location)
-    TextView launchSiteLocation;
-    @BindView(R.id.launch_site_full_name)
-    TextView launchSiteDescription;
+    public static final String FLIGHT_NUMBER = "flight_number";
+    @BindView(R.id.launch_detail_container) View launchDetailLayout;
+    @BindView(R.id.launch_detail_progressbar) ProgressBar launchDetailProgressBar;
+    @BindView(R.id.detail_toolbar) Toolbar toolbar;
+    @BindView(R.id.toolbar_layout) CollapsingToolbarLayout collapsingToolbar;
+    @BindView(R.id.play_video_fab) FloatingActionButton playVideoFab;
+    @BindView(R.id.launch_highlight_image) ImageView highlightImageView;
+    @BindView(R.id.detail_header_textview) TextView launchDetailHeader;
+    @BindView(R.id.launch_success_header) TextView launchSuccessHeader;
+    @BindView(R.id.launch_description) TextView launchDescription;
+    @BindView(R.id.location_layout) View locationLayout;
+    @BindView(R.id.launch_site_location) TextView launchSiteLocation;
+    @BindView(R.id.launch_site_full_name) TextView launchSiteDescription;
+    @BindView(R.id.launch_rocket_name) TextView launchRocketName;
 
     private LaunchDetailViewModel viewModel;
-    private int launchFlightNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +72,10 @@ public class LaunchDetailActivity extends AppCompatActivity {
         playVideoFab.setOnClickListener(arg -> playHighlightVideo());
         locationLayout.setOnClickListener(arg -> viewLaunchsiteLocation());
 
-        launchFlightNumber = getIntent().getIntExtra(ARG_ITEM_ID, 0);
+        launchDetailProgressBar.setVisibility(View.VISIBLE);
+        launchDetailLayout.setVisibility(View.INVISIBLE);
+
+        int launchFlightNumber = getIntent().getIntExtra(FLIGHT_NUMBER, 0);
         viewModel.getLaunch(launchFlightNumber)
                 .observe(this, launch -> {
                     updateLaunchInformation(launch);
@@ -109,6 +99,10 @@ public class LaunchDetailActivity extends AppCompatActivity {
         String launchSuccessMessage = launch.launchSuccess ? "Mission Success" : "Mission Failure";
         launchSuccessHeader.setText(launchSuccessMessage);
         launchDescription.setText(launch.details);
+        launchRocketName.setText(launch.rocket.name);
+
+        launchDetailProgressBar.setVisibility(View.GONE);
+        launchDetailLayout.setVisibility(View.VISIBLE);
     }
 
     private void updateLaunchpadInformation(Launchpad launchpad) {
@@ -128,7 +122,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
 
     private void viewLaunchsiteLocation() {
         try {
-            Intent mapsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("geo:%f, %f", viewModel.getLaunchpadLatitude(), viewModel.getLaunchpadLongitude())));
+            Intent mapsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Locale.getDefault(), "geo:%f, %f", viewModel.getLaunchpadLatitude(), viewModel.getLaunchpadLongitude())));
             startActivity(mapsIntent);
         } catch (Exception e) {
             Snackbar.make(launchDetailLayout, "Unable to open launchsite location", Snackbar.LENGTH_SHORT);

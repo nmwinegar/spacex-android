@@ -43,6 +43,14 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <ProgressBar
+        android:id="@+id/launch_detail_progressbar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true" />
+
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/launch_detail_container"
         android:layout_width="match_parent"

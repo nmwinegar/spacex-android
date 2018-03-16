@@ -5,4 +5,5 @@
     <string name="launch_highlight_image">Launch highlight image</string>
     <string name="launch_site_header">Launch Site</string>
     <string name="launch_site_description">Launch site location</string>
+    <string name="first_stage">First Stage</string>
 </resources>

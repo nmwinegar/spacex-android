@@ -9,10 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.RequestManager;
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.model.Launch;
 import com.nickwinegar.spacexdemo.model.Rocket;
+import com.nickwinegar.spacexdemo.util.GlideRequests;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +24,7 @@ import butterknife.ButterKnife;
 
 
 public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHolder> {
-    private final RequestManager glide;
+    private final GlideRequests glide;
     private LaunchSelectedCallback launchSelectedCallback;
     private List<Launch> launches;
 
@@ -35,7 +35,7 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
         }
     };
 
-    LaunchesAdapter(RequestManager glide, LaunchSelectedCallback launchSelectedCallback) {
+    LaunchesAdapter(GlideRequests glide, LaunchSelectedCallback launchSelectedCallback) {
         this.glide = glide;
         this.launchSelectedCallback = launchSelectedCallback;
     }
@@ -64,6 +64,7 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
         holder.itemView.setTag(launch);
         holder.itemView.setOnClickListener(launchSelectedListener);
         glide.load(launch.links.patchUrl)
+                .placeholder(R.drawable.ic_rocket)
                 .into(holder.patchView);
         Date launchTime = new Date(launch.launchDateTimestamp * 1000);
         holder.launchTime.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));

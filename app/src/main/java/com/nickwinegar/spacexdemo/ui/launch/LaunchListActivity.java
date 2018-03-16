@@ -24,10 +24,8 @@ import butterknife.ButterKnife;
  */
 public class LaunchListActivity extends AppCompatActivity {
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.launch_list)
-    RecyclerView launchList;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.launch_list) RecyclerView launchList;
 
     private LaunchesAdapter launchListAdapter;
 
@@ -62,7 +60,7 @@ public class LaunchListActivity extends AppCompatActivity {
     private final LaunchSelectedCallback callback = launch -> {
         if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
             Intent intent = new Intent(this, LaunchDetailActivity.class);
-            intent.putExtra(LaunchDetailActivity.ARG_ITEM_ID, launch.flightNumber);
+            intent.putExtra(LaunchDetailActivity.FLIGHT_NUMBER, launch.flightNumber);
             startActivity(intent);
         }
     };
