@@ -42,7 +42,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal|top"
             android:layout_marginLeft="@dimen/text_margin"
             android:layout_marginStart="@dimen/text_margin"
             android:contentDescription="@string/launch_site_description"
@@ -79,7 +79,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal|top"
             android:layout_marginLeft="@dimen/text_margin"
             android:layout_marginStart="@dimen/text_margin"
             android:contentDescription="@string/launch_site_description"
@@ -102,7 +102,29 @@
                 android:text="@string/first_stage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+            <LinearLayout
+                android:id="@+id/first_stage_cores"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:divider="@color/colorPrimary"/>
+
+            <TextView
+                android:text="@string/second_stage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+            <LinearLayout
+                android:id="@+id/second_stage_payloads"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:divider="@color/colorPrimary"/>
 
         </LinearLayout>
     </LinearLayout>

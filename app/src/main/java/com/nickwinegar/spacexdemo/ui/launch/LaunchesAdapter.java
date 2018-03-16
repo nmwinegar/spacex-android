@@ -75,13 +75,13 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
 
     private String getPayloadDescription(Launch launch) {
         StringBuilder builder = new StringBuilder();
-        if (launch.rocket.secondStage.payloads.length > 0) {
-            for (int i = 0; i < launch.rocket.secondStage.payloads.length; i++) {
-                Rocket.SecondStage.Payload payload = launch.rocket.secondStage.payloads[i];
+        if (launch.rocket.secondStage.payloads.size() > 0) {
+            for (int i = 0; i < launch.rocket.secondStage.payloads.size(); i++) {
+                Rocket.SecondStage.Payload payload = launch.rocket.secondStage.payloads.get(i);
                 builder.append(TextUtils.join("/", payload.customers));
                 builder.append(" - ");
                 builder.append(payload.name);
-                if (i < launch.rocket.secondStage.payloads.length - 1) builder.append(", ");
+                if (i < launch.rocket.secondStage.payloads.size() - 1) builder.append(", ");
             }
         }
 
@@ -94,14 +94,10 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.launch_time)
-        TextView launchTime;
-        @BindView(R.id.rocket_name)
-        TextView rocketName;
-        @BindView(R.id.payload_description)
-        TextView payloadDescription;
-        @BindView(R.id.patch_image_view)
-        ImageView patchView;
+        @BindView(R.id.launch_time) TextView launchTime;
+        @BindView(R.id.rocket_name) TextView rocketName;
+        @BindView(R.id.payload_description) TextView payloadDescription;
+        @BindView(R.id.patch_image_view) ImageView patchView;
 
         ViewHolder(View itemView) {
             super(itemView);

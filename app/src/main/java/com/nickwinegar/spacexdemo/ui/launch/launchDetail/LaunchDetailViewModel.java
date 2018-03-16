@@ -133,4 +133,16 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         }
         throw new IllegalArgumentException("Launch does not have associated longitude");
     }
+
+    String getOrbitDescription(String orbit) {
+        switch (orbit) {
+            case "LEO": return "Lower Earth Orbit";
+            case "ISS": return "International Space Station";
+            case "GTO": return "Geosynchronous Transfer Orbit";
+            case "ES-L1": return "Sun-Earth Lagrange 1";
+            case "PO": return "Polar Orbit";
+            case "SSO": return "Sun-synchronous Orbit";
+            default: return orbit;
+        }
+    }
 }

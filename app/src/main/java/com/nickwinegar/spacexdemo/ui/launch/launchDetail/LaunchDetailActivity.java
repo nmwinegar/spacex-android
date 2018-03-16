@@ -11,20 +11,25 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.model.Launch;
 import com.nickwinegar.spacexdemo.model.Launchpad;
+import com.nickwinegar.spacexdemo.model.Rocket;
 import com.nickwinegar.spacexdemo.ui.launch.LaunchListActivity;
 import com.nickwinegar.spacexdemo.util.GlideApp;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -50,6 +55,8 @@ public class LaunchDetailActivity extends AppCompatActivity {
     @BindView(R.id.launch_site_location) TextView launchSiteLocation;
     @BindView(R.id.launch_site_full_name) TextView launchSiteDescription;
     @BindView(R.id.launch_rocket_name) TextView launchRocketName;
+    @BindView(R.id.first_stage_cores) LinearLayout launchFirstStageCores;
+    @BindView(R.id.second_stage_payloads) LinearLayout secondStagePayloads;
 
     private LaunchDetailViewModel viewModel;
 
@@ -100,6 +107,8 @@ public class LaunchDetailActivity extends AppCompatActivity {
         launchSuccessHeader.setText(launchSuccessMessage);
         launchDescription.setText(launch.details);
         launchRocketName.setText(launch.rocket.name);
+        addCoreViews(launch.rocket.firstStage.cores);
+        addPayloadViews(launch.rocket.secondStage.payloads);
 
         launchDetailProgressBar.setVisibility(View.GONE);
         launchDetailLayout.setVisibility(View.VISIBLE);
@@ -108,6 +117,43 @@ public class LaunchDetailActivity extends AppCompatActivity {
     private void updateLaunchpadInformation(Launchpad launchpad) {
         launchSiteLocation.setText(String.format("%s, %s", launchpad.launchpadLocation.name, launchpad.launchpadLocation.region));
         launchSiteDescription.setText(launchpad.fullName);
+    }
+
+    private void addCoreViews(List<Rocket.FirstStage.Core> cores) {
+        launchFirstStageCores.removeAllViews();
+        for (Rocket.FirstStage.Core core : cores) {
+            View coreItem = LayoutInflater.from(this).inflate(R.layout.core_detail, null);
+
+            TextView coreSerial = coreItem.findViewById(R.id.core_serial);
+            TextView coreFlightCount = coreItem.findViewById(R.id.core_flight_count);
+            TextView coreLandingSuccess = coreItem.findViewById(R.id.core_landing_success);
+
+            coreSerial.setText(String.format("Serial: %s", core.serial));
+            coreFlightCount.setText(String.format(Locale.getDefault(), "Flight #%d", core.flightCount));
+            if (core.landingSuccess) {
+                coreLandingSuccess.setText(R.string.landing_success);
+                coreLandingSuccess.setVisibility(View.VISIBLE);
+            } else coreLandingSuccess.setVisibility(View.GONE);
+
+            launchFirstStageCores.addView(coreItem);
+        }
+    }
+
+    private void addPayloadViews(List<Rocket.SecondStage.Payload> payloads) {
+        secondStagePayloads.removeAllViews();
+        for (Rocket.SecondStage.Payload payload : payloads) {
+            View payloadItem = LayoutInflater.from(this).inflate(R.layout.payload_detail, null);
+
+            TextView payloadName = payloadItem.findViewById(R.id.payload_name);
+            TextView payloadCustomers = payloadItem.findViewById(R.id.payload_customers);
+            TextView payloadOrbit = payloadItem.findViewById(R.id.payload_orbit);
+
+            payloadName.setText(String.format("%s - %s", payload.payloadType, payload.name));
+            payloadCustomers.setText(TextUtils.join("/", payload.customers));
+            payloadOrbit.setText(viewModel.getOrbitDescription(payload.orbit));
+
+            secondStagePayloads.addView(payloadItem);
+        }
     }
 
     private void playHighlightVideo() {

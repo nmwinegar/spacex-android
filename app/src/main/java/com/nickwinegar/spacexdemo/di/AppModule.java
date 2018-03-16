@@ -1,5 +1,6 @@
 package com.nickwinegar.spacexdemo.di;
 
+import com.google.gson.GsonBuilder;
 import com.nickwinegar.spacexdemo.SpaceXDemoApp;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.util.ConnectionService;
@@ -23,23 +24,26 @@ public class AppModule {
         this.spaceXDemoApp = spaceXDemoApp;
     }
 
-    @Singleton @Provides
+    @Singleton
+    @Provides
     SpaceXDemoApp providesApplication() {
         return spaceXDemoApp;
     }
 
-    @Singleton @Provides
+    @Singleton
+    @Provides
     ConnectionService provideConnectionService(SpaceXDemoApp spaceXApp) {
         return new ConnectionService(spaceXApp);
     }
 
-    @Singleton @Provides
+    @Singleton
+    @Provides
     SpaceXService provideSpaceXService() {
         OkHttpClient client = getClient();
         return new Retrofit.Builder()
                 .baseUrl("https://api.spacexdata.com/v2/")
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().serializeNulls().create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(SpaceXService.class);
