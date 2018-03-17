@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * https://github.com/googlesamples/android-architecture-components/issues/63
+ * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  *
  * <p>
  * A lifecycle-aware observable that sends only new updates after subscription, used for events like
