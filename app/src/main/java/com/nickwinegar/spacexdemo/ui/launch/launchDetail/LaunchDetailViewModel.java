@@ -7,7 +7,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.net.Uri;
 import android.net.UrlQuerySanitizer;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.nickwinegar.spacexdemo.SpaceXDemoApp;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
@@ -24,10 +23,8 @@ import io.reactivex.schedulers.Schedulers;
 public class LaunchDetailViewModel extends AndroidViewModel {
     private static final String highlightImageFormat = "https://i.ytimg.com/vi/%s/hqdefault.jpg";
 
-    @Inject
-    SpaceXService spaceXService;
-    @Inject
-    ConnectionService connectionService;
+    @Inject public SpaceXService spaceXService;
+    @Inject public ConnectionService connectionService;
 
     private final MutableLiveData<Launch> launch;
     private final MutableLiveData<Launchpad> launchpad;
@@ -42,9 +39,9 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         errorMessage = new SingleLiveEvent<>();
     }
 
-    LiveData<Launch> getLaunch(int flightNumber) {
+    public LiveData<Launch> getLaunch(int flightNumber) {
         if (!connectionService.isConnected()) {
-            errorMessage.setValue("Unable to get launches, network is unavailable.");
+            errorMessage.setValue("Unable to get launch, network is unavailable.");
             return launch;
         }
 
@@ -59,10 +56,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                         launch.setValue(newLaunch);
                     } else
                         errorMessage.setValue("More than one launch found for that flight number");
-                }, error -> {
-                    Log.e("SpaceX", error.getMessage());
-                    errorMessage.setValue("Error retrieving launch information.");
-                });
+                }, error -> errorMessage.setValue("Error retrieving launch information."));
 
         return launch;
     }
@@ -77,15 +71,14 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         spaceXService.getLaunchpad(launchpadId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this.launchpad::setValue, error -> {
-                    Log.e("SpaceX", error.getMessage());
-                    errorMessage.setValue("Error retrieving launchpad information.");
-                });
+                .subscribe(this.launchpad::setValue, error -> errorMessage.setValue("Error retrieving launchpad information."));
 
         return launchpad;
     }
 
     private void getLaunchHighlightImage(Launch highlightLaunch) {
+        if (highlightLaunch.links == null) return;
+
         String videoUrl = highlightLaunch.links.videoUrl;
         if (!videoUrl.isEmpty() && videoUrl.contains("www.youtube.com")) {
             UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(videoUrl);
@@ -136,13 +129,20 @@ public class LaunchDetailViewModel extends AndroidViewModel {
 
     String getOrbitDescription(String orbit) {
         switch (orbit) {
-            case "LEO": return "Lower Earth Orbit";
-            case "ISS": return "International Space Station";
-            case "GTO": return "Geosynchronous Transfer Orbit";
-            case "ES-L1": return "Sun-Earth Lagrange 1";
-            case "PO": return "Polar Orbit";
-            case "SSO": return "Sun-synchronous Orbit";
-            default: return orbit;
+            case "LEO":
+                return "Lower Earth Orbit";
+            case "ISS":
+                return "International Space Station";
+            case "GTO":
+                return "Geosynchronous Transfer Orbit";
+            case "ES-L1":
+                return "Sun-Earth Lagrange 1";
+            case "PO":
+                return "Polar Orbit";
+            case "SSO":
+                return "Sun-synchronous Orbit";
+            default:
+                return orbit;
         }
     }
 }
