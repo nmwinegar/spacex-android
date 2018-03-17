@@ -20,6 +20,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
+import static android.support.test.espresso.matcher.ViewMatchers.hasMinimumChildCount;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
@@ -36,6 +37,7 @@ public class LaunchListActivityTest {
         // Launch list displays on activity start
         ViewInteraction recyclerView = onView(withId(R.id.launch_list));
         recyclerView.check(matches(isDisplayed()));
+        recyclerView.check(matches(hasMinimumChildCount(1)));
     }
 
     @Test
