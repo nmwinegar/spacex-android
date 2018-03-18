@@ -10,4 +10,6 @@
     <string name="landing_success">Landed Successfully</string>
     <string name="upcoming_launches">Upcoming</string>
     <string name="previous_launches">Previous</string>
+    <string name="launch_error_message">Unable to retrieve launch information.</string>
+    <string name="retry_message">Retry</string>
 </resources>

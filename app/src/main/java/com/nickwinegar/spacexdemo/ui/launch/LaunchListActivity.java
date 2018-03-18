@@ -11,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailActivity;
@@ -28,6 +31,8 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tab_layout) TabLayout tabLayout;
     @BindView(R.id.launch_list) RecyclerView launchList;
+    @BindView(R.id.error_layout) LinearLayout errorLayout;
+    @BindView(R.id.retry_button) Button retryButton;
 
     private LaunchesAdapter launchListAdapter;
     private LaunchListViewModel viewModel;
@@ -44,13 +49,22 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
         setupTabs();
         toolbar.setTitle(getTitle());
         setupRecyclerView(launchList);
+        retryButton.setOnClickListener(arg -> {
+            loadLaunches(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()));
+        });
 
         viewModel.getLaunches()
-                .observe(this, launches -> launchListAdapter.setLaunches(launches));
+                .observe(this, launches -> {
+                    launchListAdapter.setLaunches(launches);
+                    launchList.setVisibility(View.VISIBLE);
+                    errorLayout.setVisibility(View.GONE);
+                });
         viewModel.getErrorMessage()
                 .observe(this, error -> {
                     if (error != null) {
                         Snackbar.make(launchList, error, Snackbar.LENGTH_LONG).show();
+                        launchList.setVisibility(View.GONE);
+                        errorLayout.setVisibility(View.VISIBLE);
                     }
                 });
 

@@ -36,6 +36,9 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <include layout="@layout/error_loading"
+            android:visibility="gone" />
+
         <include layout="@layout/launch_list"/>
     </FrameLayout>
 
