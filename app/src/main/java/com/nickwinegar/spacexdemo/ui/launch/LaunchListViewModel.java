@@ -39,9 +39,13 @@ public class LaunchListViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Launch>> getLaunches() {
+        return launches;
+    }
+
+    public void loadPreviousLaunches() {
         if (!connectionService.isConnected()) {
             errorMessage.setValue("Unable to get launches, network is unavailable.");
-            return launches;
+            return;
         }
 
         spaceXService.getLaunches()
@@ -52,8 +56,22 @@ public class LaunchListViewModel extends AndroidViewModel {
                     Collections.sort(launches, (launch1, launch2) -> Long.compare(launch2.launchDateTimestamp, launch1.launchDateTimestamp));
                     this.launches.setValue(launches);
                 }, error -> errorMessage.setValue("Error retrieving launch information."));
+    }
 
-        return launches;
+    void loadUpcomingLaunches() {
+        if (!connectionService.isConnected()) {
+            errorMessage.setValue("Unable to get launches, network is unavailable.");
+            return;
+        }
+
+        spaceXService.getUpcomingLaunches()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(launches -> {
+                    // Sort launches ascending
+                    Collections.sort(launches, (launch1, launch2) -> Long.compare(launch1.launchDateTimestamp, launch2.launchDateTimestamp));
+                    this.launches.setValue(launches);
+                }, error -> errorMessage.setValue("Error retrieving launch information."));
     }
 
     public SingleLiveEvent<String> getErrorMessage() {

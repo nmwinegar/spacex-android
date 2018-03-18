@@ -8,4 +8,6 @@
     <string name="first_stage">First Stage</string>
     <string name="second_stage">Second Stage</string>
     <string name="landing_success">Landed Successfully</string>
+    <string name="upcoming_launches">Upcoming</string>
+    <string name="previous_launches">Previous</string>
 </resources>

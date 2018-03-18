@@ -42,6 +42,7 @@ import butterknife.ButterKnife;
  */
 public class LaunchDetailActivity extends AppCompatActivity {
     public static final String FLIGHT_NUMBER = "flight_number";
+    public static final String IS_UPCOMING = "isUpcoming";
     @BindView(R.id.launch_detail_container) View launchDetailLayout;
     @BindView(R.id.launch_detail_progressbar) ProgressBar launchDetailProgressBar;
     @BindView(R.id.detail_toolbar) Toolbar toolbar;
@@ -59,6 +60,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
     @BindView(R.id.second_stage_payloads) LinearLayout secondStagePayloads;
 
     private LaunchDetailViewModel viewModel;
+    private boolean launchIsUpcoming;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +85,8 @@ public class LaunchDetailActivity extends AppCompatActivity {
         launchDetailLayout.setVisibility(View.INVISIBLE);
 
         int launchFlightNumber = getIntent().getIntExtra(FLIGHT_NUMBER, 0);
-        viewModel.getLaunch(launchFlightNumber)
+        launchIsUpcoming = getIntent().getBooleanExtra(IS_UPCOMING, false);
+        viewModel.getLaunch()
                 .observe(this, launch -> {
                     updateLaunchInformation(launch);
                     if (launch != null) {
@@ -91,20 +94,33 @@ public class LaunchDetailActivity extends AppCompatActivity {
                                 .observe(this, this::updateLaunchpadInformation);
                     }
                 });
+
+        if (launchIsUpcoming) viewModel.loadUpcomingLaunch(launchFlightNumber);
+        else viewModel.loadPreviousLaunch(launchFlightNumber);
     }
 
     private void updateLaunchInformation(Launch launch) {
         if (launch == null) return;
-        if (!launch.links.highlightImageUrl.isEmpty()) {
+        if (launch.links.highlightImageUrl != null && !launch.links.highlightImageUrl.isEmpty()) {
             GlideApp.with(this)
                     .load(launch.links.highlightImageUrl)
+                    .placeholder(R.drawable.ic_rocket)
                     .centerCrop()
                     .into(highlightImageView);
+        } else {
+            GlideApp.with(this)
+                    .load("")
+                    .placeholder(R.drawable.ic_rocket)
+                    .centerCrop()
+                    .into(highlightImageView);
+            playVideoFab.setVisibility(View.GONE);
         }
         Date launchTime = new Date(launch.launchDateTimestamp * 1000);
         launchDetailHeader.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
-        String launchSuccessMessage = launch.launchSuccess ? "Mission Success" : "Mission Failure";
-        launchSuccessHeader.setText(launchSuccessMessage);
+        if (!launchIsUpcoming) {
+            String launchSuccessMessage = launch.launchSuccess ? "Mission Success" : "Mission Failure";
+            launchSuccessHeader.setText(launchSuccessMessage);
+        } else launchSuccessHeader.setVisibility(View.GONE);
         launchDescription.setText(launch.details);
         launchRocketName.setText(launch.rocket.name);
         addCoreViews(launch.rocket.firstStage.cores);

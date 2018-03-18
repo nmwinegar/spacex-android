@@ -71,6 +71,7 @@ public class LaunchListViewModelTest {
 
         // when launches are requested from the VM
         viewModel.getLaunches();
+        viewModel.loadPreviousLaunches();
 
         // launch observers should be notified on change, and no error should occur
         verify(errorObserver, never()).onChanged(any());
@@ -85,6 +86,7 @@ public class LaunchListViewModelTest {
 
         // When launches are requested from the VM
         viewModel.getLaunches();
+        viewModel.loadPreviousLaunches();
 
         // An error notification should be sent
         verify(errorObserver).onChanged("Unable to get launches, network is unavailable.");
@@ -99,6 +101,7 @@ public class LaunchListViewModelTest {
 
         // When launches are requested from the VM
         viewModel.getLaunches();
+        viewModel.loadPreviousLaunches();
 
         // An error notification should be sent
         verify(errorObserver).onChanged("Error retrieving launch information.");

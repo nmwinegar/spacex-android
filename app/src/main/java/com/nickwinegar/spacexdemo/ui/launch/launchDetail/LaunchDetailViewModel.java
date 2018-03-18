@@ -39,10 +39,14 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         errorMessage = new SingleLiveEvent<>();
     }
 
-    public LiveData<Launch> getLaunch(int flightNumber) {
+    public LiveData<Launch> getLaunch() {
+        return launch;
+    }
+
+    public void loadPreviousLaunch(int flightNumber) {
         if (!connectionService.isConnected()) {
             errorMessage.setValue("Unable to get launch, network is unavailable.");
-            return launch;
+            return;
         }
 
         // Sort launches from most recent to oldest
@@ -57,8 +61,27 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                     } else
                         errorMessage.setValue("More than one launch found for that flight number");
                 }, error -> errorMessage.setValue("Error retrieving launch information."));
+    }
 
-        return launch;
+
+    void loadUpcomingLaunch(int flightNumber) {
+        if (!connectionService.isConnected()) {
+            errorMessage.setValue("Unable to get launch, network is unavailable.");
+            return;
+        }
+
+        // Sort launches from most recent to oldest
+        spaceXService.getUpcomingLaunches()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(launches -> {
+                    for (Launch upcomingLaunch : launches) {
+                        if (upcomingLaunch.flightNumber == flightNumber) {
+                            launch.setValue(upcomingLaunch);
+                            return;
+                        }
+                    }
+                }, error -> errorMessage.setValue("Error retrieving launch information."));
     }
 
     LiveData<Launchpad> getLaunchpadDetails(String launchpadId) {

@@ -17,6 +17,10 @@ public interface SpaceXService {
     Observable<List<Launch>> getLaunches();
 
     @Headers("Cache-Control: max-stale=3600")
+    @GET("launches/upcoming")
+    Observable<List<Launch>> getUpcomingLaunches();
+
+    @Headers("Cache-Control: max-stale=3600")
     @GET("launches")
     Observable<List<Launch>> getLaunch(@Query("flight_number") int flightNumber);
 

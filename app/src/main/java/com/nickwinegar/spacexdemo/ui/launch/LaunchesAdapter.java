@@ -1,6 +1,7 @@
 package com.nickwinegar.spacexdemo.ui.launch;
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -40,11 +41,37 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
         this.launchSelectedCallback = launchSelectedCallback;
     }
 
-    // TODO Diff incoming launches to only update what is needed
-    void setLaunches(List<Launch> launches) {
-        if (this.launches == null) {
-            this.launches = launches;
-            notifyItemRangeInserted(0, launches.size());
+    void setLaunches(List<Launch> newLaunches) {
+        if (launches == null) {
+            launches = newLaunches;
+            notifyItemRangeInserted(0, newLaunches.size());
+        } else {
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return launches.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return newLaunches.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return launches.get(oldItemPosition).flightNumber ==
+                            newLaunches.get(newItemPosition).flightNumber;
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    Launch newLaunch = newLaunches.get(newItemPosition);
+                    Launch oldLaunch = launches.get(oldItemPosition);
+                    return newLaunch.flightNumber == oldLaunch.flightNumber;
+                }
+            });
+            launches = newLaunches;
+            result.dispatchUpdatesTo(this);
         }
     }
 

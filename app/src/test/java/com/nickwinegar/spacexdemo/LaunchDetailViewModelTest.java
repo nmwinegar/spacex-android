@@ -68,11 +68,11 @@ public class LaunchDetailViewModelTest {
         List<Launch> testLaunches = getTestLaunches();
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
-        viewModel.getLaunch(testFlightNumber).observeForever(launchObserver);
+        viewModel.getLaunch().observeForever(launchObserver);
         viewModel.getErrorMessage().observeForever(errorObserver);
 
         // when launches are requested from the VM
-        viewModel.getLaunch(testFlightNumber);
+        viewModel.loadPreviousLaunch(testFlightNumber);
 
         // launch observers should be notified on change, and no error should occur
         verify(errorObserver, never()).onChanged(any());
@@ -86,7 +86,8 @@ public class LaunchDetailViewModelTest {
         viewModel.getErrorMessage().observeForever(errorObserver);
 
         // When launches are requested from the VM
-        viewModel.getLaunch(testFlightNumber);
+        viewModel.getLaunch();
+        viewModel.loadPreviousLaunch(testFlightNumber);
 
         // An error notification should be sent
         verify(errorObserver).onChanged("Unable to get launch, network is unavailable.");
@@ -100,7 +101,8 @@ public class LaunchDetailViewModelTest {
         viewModel.getErrorMessage().observeForever(errorObserver);
 
         // When launches are requested from the VM
-        viewModel.getLaunch(testFlightNumber);
+        viewModel.getLaunch();
+        viewModel.loadPreviousLaunch(testFlightNumber);
 
         // An error notification should be sent
         verify(errorObserver).onChanged("Error retrieving launch information.");
@@ -113,7 +115,7 @@ public class LaunchDetailViewModelTest {
         testLaunches.get(0).links.videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
-        viewModel.getLaunch(testFlightNumber)
+        viewModel.getLaunch()
                 .observeForever(launch -> {
                     // When web uri is requested from the VM
                     Uri uri = viewModel.getVideoWebUri();
@@ -121,6 +123,7 @@ public class LaunchDetailViewModelTest {
                     // web uri is correct
                     Assert.assertEquals("http://www.youtube.com/watch?v=ABcdEFgH", uri.toString());
                 });
+        viewModel.loadPreviousLaunch(testFlightNumber);
     }
 
     @Test
@@ -130,7 +133,7 @@ public class LaunchDetailViewModelTest {
         testLaunches.get(0).links.videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
-        viewModel.getLaunch(testFlightNumber)
+        viewModel.getLaunch()
                 .observeForever(launch -> {
                     // When web uri is requested from the VM
                     Uri uri = viewModel.getVideoAppUri();
@@ -138,6 +141,7 @@ public class LaunchDetailViewModelTest {
                     // web uri is correct
                     Assert.assertEquals("vnd.youtube:ABcdEFgH", uri.toString());
                 });
+        viewModel.loadPreviousLaunch(testFlightNumber);
     }
 
     public List<Launch> getTestLaunches() {
