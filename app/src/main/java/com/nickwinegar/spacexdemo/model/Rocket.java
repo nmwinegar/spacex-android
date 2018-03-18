@@ -5,8 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class Rocket {
-    @SerializedName("rocket_id")
-    public String rocketId;
     @SerializedName("rocket_name")
     public String name;
     @SerializedName("first_stage")

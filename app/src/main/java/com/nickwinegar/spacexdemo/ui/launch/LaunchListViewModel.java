@@ -58,7 +58,7 @@ public class LaunchListViewModel extends AndroidViewModel {
                 }, error -> errorMessage.setValue("Error retrieving launch information."));
     }
 
-    void loadUpcomingLaunches() {
+    public void loadUpcomingLaunches() {
         if (!connectionService.isConnected()) {
             errorMessage.setValue("Unable to get launches, network is unavailable.");
             return;

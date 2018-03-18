@@ -61,7 +61,7 @@ public class LaunchListViewModelTest {
     }
 
     @Test
-    public void launchListViewModel_LaunchesReturnedByApiOnSuccess() {
+    public void launchListViewModel_PreviousLaunchesReturnedByApiOnSuccess() {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
         when(mockConnectionService.isConnected()).thenReturn(true);
@@ -105,6 +105,24 @@ public class LaunchListViewModelTest {
 
         // An error notification should be sent
         verify(errorObserver).onChanged("Error retrieving launch information.");
+    }
+
+    @Test
+    public void launchListViewModel_UpcomingLaunchesReturnedByApiOnSuccess() {
+        // Given the device is connected and Space X API call succeeds
+        List<Launch> testLaunches = getTestLaunches();
+        when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockSpaceXService.getUpcomingLaunches()).thenReturn(Observable.just(testLaunches));
+        viewModel.getLaunches().observeForever(launchObserver);
+        viewModel.getErrorMessage().observeForever(errorObserver);
+
+        // when launches are requested from the VM
+        viewModel.getLaunches();
+        viewModel.loadUpcomingLaunches();
+
+        // launch observers should be notified on change, and no error should occur
+        verify(errorObserver, never()).onChanged(any());
+        verify(launchObserver, atLeastOnce()).onChanged(testLaunches);
     }
 
     @NonNull
