@@ -68,7 +68,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     }
 
 
-    void loadUpcomingLaunch(int flightNumber) {
+    public void loadUpcomingLaunch(int flightNumber) {
         if (!connectionService.isConnected()) {
             errorMessage.setValue("Unable to get launch, network is unavailable.");
             return;

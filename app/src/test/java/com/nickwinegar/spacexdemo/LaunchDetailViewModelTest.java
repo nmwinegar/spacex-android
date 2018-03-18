@@ -109,6 +109,23 @@ public class LaunchDetailViewModelTest {
     }
 
     @Test
+    public void launchDetailViewModel_upcomingLaunchReturnedByApiOnSuccess() {
+        // Given the device is connected and Space X API call succeeds
+        List<Launch> testLaunches = getTestLaunches();
+        when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockSpaceXService.getUpcomingLaunches()).thenReturn(Observable.just(testLaunches));
+        viewModel.getLaunch().observeForever(launchObserver);
+        viewModel.getErrorMessage().observeForever(errorObserver);
+
+        // when launches are requested from the VM
+        viewModel.loadUpcomingLaunch(testFlightNumber);
+
+        // launch observers should be notified on change, and no error should occur
+        verify(errorObserver, never()).onChanged(any());
+        verify(launchObserver, atLeastOnce()).onChanged(testLaunches.get(0));
+    }
+
+    @Test
     public void launchDetailViewModel_getVideoWebUriReturnsExpectedUri() {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
