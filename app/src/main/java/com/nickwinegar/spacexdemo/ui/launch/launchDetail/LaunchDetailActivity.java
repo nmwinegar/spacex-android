@@ -38,7 +38,8 @@ import butterknife.ButterKnife;
 /**
  * An activity representing a single Launch detail screen.
  * This view displays details around the launch as well as
- * provide links for the user to view additional details
+ * provide links for the user to access additional functionality
+ * like YouTube highlight video and launch location
  */
 public class LaunchDetailActivity extends AppCompatActivity {
     public static final String FLIGHT_NUMBER = "flight_number";
@@ -94,6 +95,12 @@ public class LaunchDetailActivity extends AppCompatActivity {
                                 .observe(this, this::updateLaunchpadInformation);
                     }
                 });
+        viewModel.getErrorMessage()
+                .observe(this, error -> {
+                    if (error != null) {
+                        Snackbar.make(launchDetailLayout, error, Snackbar.LENGTH_SHORT);
+                    }
+                });
 
         if (launchIsUpcoming) viewModel.loadUpcomingLaunch(launchFlightNumber);
         else viewModel.loadPreviousLaunch(launchFlightNumber);
@@ -138,7 +145,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
     private void addCoreViews(List<Rocket.FirstStage.Core> cores) {
         launchFirstStageCores.removeAllViews();
         for (Rocket.FirstStage.Core core : cores) {
-            View coreItem = LayoutInflater.from(this).inflate(R.layout.core_detail, null);
+            View coreItem = LayoutInflater.from(this).inflate(R.layout.core_detail, launchFirstStageCores);
 
             TextView coreSerial = coreItem.findViewById(R.id.core_serial);
             TextView coreFlightCount = coreItem.findViewById(R.id.core_flight_count);
@@ -158,7 +165,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
     private void addPayloadViews(List<Rocket.SecondStage.Payload> payloads) {
         secondStagePayloads.removeAllViews();
         for (Rocket.SecondStage.Payload payload : payloads) {
-            View payloadItem = LayoutInflater.from(this).inflate(R.layout.payload_detail, null);
+            View payloadItem = LayoutInflater.from(this).inflate(R.layout.payload_detail, secondStagePayloads);
 
             TextView payloadName = payloadItem.findViewById(R.id.payload_name);
             TextView payloadCustomers = payloadItem.findViewById(R.id.payload_customers);

@@ -43,6 +43,10 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         return launch;
     }
 
+    public SingleLiveEvent<String> getErrorMessage() {
+        return errorMessage;
+    }
+
     public void loadPreviousLaunch(int flightNumber) {
         if (!connectionService.isConnected()) {
             errorMessage.setValue("Unable to get launch, network is unavailable.");
@@ -108,10 +112,6 @@ public class LaunchDetailViewModel extends AndroidViewModel {
             String videoId = sanitizer.getValue("v");
             highlightLaunch.links.highlightImageUrl = String.format(highlightImageFormat, videoId);
         }
-    }
-
-    public SingleLiveEvent<String> getErrorMessage() {
-        return errorMessage;
     }
 
     public Uri getVideoWebUri() {
