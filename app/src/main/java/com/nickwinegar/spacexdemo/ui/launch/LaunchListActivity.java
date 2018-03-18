@@ -49,9 +49,7 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
         setupTabs();
         toolbar.setTitle(getTitle());
         setupRecyclerView(launchList);
-        retryButton.setOnClickListener(arg -> {
-            loadLaunches(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()));
-        });
+        retryButton.setOnClickListener(arg -> loadLaunches(tabLayout.getTabAt(tabLayout.getSelectedTabPosition())));
 
         viewModel.getLaunches()
                 .observe(this, launches -> {
@@ -60,13 +58,7 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
                     errorLayout.setVisibility(View.GONE);
                 });
         viewModel.getErrorMessage()
-                .observe(this, error -> {
-                    if (error != null) {
-                        Snackbar.make(launchList, error, Snackbar.LENGTH_LONG).show();
-                        launchList.setVisibility(View.GONE);
-                        errorLayout.setVisibility(View.VISIBLE);
-                    }
-                });
+                .observe(this, this::handleError);
 
         loadLaunches(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()));
     }
@@ -88,32 +80,41 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
         if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
             Intent intent = new Intent(this, LaunchDetailActivity.class);
             intent.putExtra(LaunchDetailActivity.FLIGHT_NUMBER, launch.flightNumber);
-            boolean isUpcomingLaunch = tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getText() == getResources().getString(R.string.upcoming_launches);
+            TabLayout.Tab selectedTab = tabLayout.getTabAt(tabLayout.getSelectedTabPosition());
+            String tabTitle = selectedTab == null || selectedTab.getText() == null ? "" : selectedTab.getText().toString();
+            boolean isUpcomingLaunch = tabTitle.equals(getResources().getString(R.string.upcoming_launches));
             intent.putExtra(LaunchDetailActivity.IS_UPCOMING, isUpcomingLaunch);
             startActivity(intent);
         }
     };
+
+    private void handleError(String error) {
+        if (error != null) {
+            Snackbar.make(launchList, error, Snackbar.LENGTH_LONG).show();
+            launchList.setVisibility(View.GONE);
+            errorLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void loadLaunches(TabLayout.Tab tab) {
+        String tabTitle = tab.getText() == null ? "" : tab.getText().toString();
+        if (tabTitle.equals(getResources().getText(R.string.upcoming_launches))) {
+            viewModel.loadUpcomingLaunches();
+        } else if (tabTitle.equals(getResources().getText(R.string.previous_launches))) {
+            viewModel.loadPreviousLaunches();
+        }
+    }
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         loadLaunches(tab);
     }
 
-    private void loadLaunches(TabLayout.Tab tab) {
-        if (tab.getText().equals(getResources().getText(R.string.upcoming_launches))) {
-            viewModel.loadUpcomingLaunches();
-        } else if (tab.getText().equals(getResources().getText(R.string.previous_launches))) {
-            viewModel.loadPreviousLaunches();
-        }
-    }
-
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-
     }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-
     }
 }
