@@ -14,20 +14,4 @@ public class Launch {
     public boolean launchSuccess;
     @SerializedName("launch_site")
     public LaunchSite launchSite;
-
-    public class LaunchLinks {
-        @SerializedName("mission_patch")
-        public String patchUrl;
-        @SerializedName("video_link")
-        public String videoUrl;
-
-        public String highlightImageUrl;
-    }
-
-    public class LaunchSite {
-        @SerializedName("site_id")
-        public String id;
-        @SerializedName("site_name_long")
-        public String name;
-    }
 }

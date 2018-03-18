@@ -2,10 +2,12 @@ package com.nickwinegar.spacexdemo;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.Observer;
+import android.net.Uri;
 
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.di.AppComponent;
 import com.nickwinegar.spacexdemo.model.Launch;
+import com.nickwinegar.spacexdemo.model.LaunchLinks;
 import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailViewModel;
 import com.nickwinegar.spacexdemo.util.ConnectionService;
 
@@ -56,12 +58,12 @@ public class LaunchDetailViewModelTest {
     }
 
     @Test
-    public void launchListViewModel_InitializesOnCreate() {
+    public void launchDetailViewModel_InitializesOnCreate() {
         Assert.assertNotNull("view model has been initialized", viewModel);
     }
 
     @Test
-    public void launchListViewModel_LaunchReturnedByApiOnSuccess() {
+    public void launchDetailViewModel_LaunchReturnedByApiOnSuccess() {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
         when(mockConnectionService.isConnected()).thenReturn(true);
@@ -78,7 +80,7 @@ public class LaunchDetailViewModelTest {
     }
 
     @Test
-    public void launchListViewModel_GetLaunchErrorMessageWhenNotConnected() {
+    public void launchDetailViewModel_GetLaunchErrorMessageWhenNotConnected() {
         // Given the device does not have an available network connection
         when(mockConnectionService.isConnected()).thenReturn(false);
         viewModel.getErrorMessage().observeForever(errorObserver);
@@ -91,7 +93,7 @@ public class LaunchDetailViewModelTest {
     }
 
     @Test
-    public void launchListViewModel_GetLaunchErrorMessageWhenApiCallFails() {
+    public void launchDetailViewModel_GetLaunchErrorMessageWhenApiCallFails() {
         // Given the device is connected but the Space X api call fails
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.error(new Exception("Test Exception")));
@@ -104,10 +106,45 @@ public class LaunchDetailViewModelTest {
         verify(errorObserver).onChanged("Error retrieving launch information.");
     }
 
+    @Test
+    public void launchDetailViewModel_getVideoWebUriReturnsExpectedUri() {
+        // Given the device is connected and Space X API call succeeds
+        List<Launch> testLaunches = getTestLaunches();
+        testLaunches.get(0).links.videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
+        when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
+        viewModel.getLaunch(testFlightNumber)
+                .observeForever(launch -> {
+                    // When web uri is requested from the VM
+                    Uri uri = viewModel.getVideoWebUri();
+
+                    // web uri is correct
+                    Assert.assertEquals("http://www.youtube.com/watch?v=ABcdEFgH", uri.toString());
+                });
+    }
+
+    @Test
+    public void launchDetailViewModel_getVideoAppUriReturnsExpectedUri() {
+        // Given the device is connected and Space X API call succeeds
+        List<Launch> testLaunches = getTestLaunches();
+        testLaunches.get(0).links.videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
+        when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
+        viewModel.getLaunch(testFlightNumber)
+                .observeForever(launch -> {
+                    // When web uri is requested from the VM
+                    Uri uri = viewModel.getVideoAppUri();
+
+                    // web uri is correct
+                    Assert.assertEquals("vnd.youtube:ABcdEFgH", uri.toString());
+                });
+    }
+
     public List<Launch> getTestLaunches() {
         Launch testLaunch = new Launch();
         testLaunch.flightNumber = 999;
         testLaunch.launchDateTimestamp = new Date().getTime();
+        testLaunch.links = new LaunchLinks();
         List<Launch> testLaunches = new ArrayList<>();
         testLaunches.add(testLaunch);
         return testLaunches;

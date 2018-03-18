@@ -77,7 +77,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     }
 
     private void getLaunchHighlightImage(Launch highlightLaunch) {
-        if (highlightLaunch.links == null) return;
+        if (highlightLaunch.links == null || highlightLaunch.links.videoUrl == null) return;
 
         String videoUrl = highlightLaunch.links.videoUrl;
         if (!videoUrl.isEmpty() && videoUrl.contains("www.youtube.com")) {
@@ -91,12 +91,12 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         return errorMessage;
     }
 
-    Uri getVideoWebUri() {
+    public Uri getVideoWebUri() {
         String webVideoUriFormat = "http://www.youtube.com/watch?v=%s";
         return getVideoUri(webVideoUriFormat);
     }
 
-    Uri getVideoAppUri() {
+    public Uri getVideoAppUri() {
         String appVideoUriFormat = "vnd.youtube:%s";
         return getVideoUri(appVideoUriFormat);
     }
