@@ -62,7 +62,6 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
         tabLayout.addTab(tabLayout.newTab().setText(R.string.upcoming_launches));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addOnTabSelectedListener(this);
-        tabLayout.getTabAt(0).select();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
