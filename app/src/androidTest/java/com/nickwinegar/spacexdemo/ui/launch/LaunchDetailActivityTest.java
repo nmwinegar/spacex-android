@@ -3,6 +3,8 @@ package com.nickwinegar.spacexdemo.ui.launch;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.IdlingRegistry;
+import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -12,9 +14,13 @@ import android.view.View;
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailActivity;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.lang.ref.WeakReference;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -22,13 +28,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasMinimumChild
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static android.view.View.GONE;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.anyOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class LaunchDetailActivityTest {
-    private int testFlightNumber = 57;
+    private ViewVisibilityIdleResource idleResource;
 
     @Rule
     public IntentsTestRule<LaunchDetailActivity> activityTestRule = new IntentsTestRule<LaunchDetailActivity>(LaunchDetailActivity.class) {
@@ -37,23 +44,24 @@ public class LaunchDetailActivityTest {
         protected Intent getActivityIntent() {
             Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
             Intent intent = new Intent(targetContext, LaunchDetailActivity.class);
+            int testFlightNumber = 57;
             intent.putExtra(LaunchDetailActivity.FLIGHT_NUMBER, testFlightNumber);
             return intent;
         }
-
-        @Override
-        protected void afterActivityLaunched() {
-            // Wait for progress bar to no longer be visible
-            // our activity with data has now loaded
-            while (getActivity().findViewById(R.id.launch_detail_progressbar).getVisibility() == View.VISIBLE) {
-                try {
-                    wait(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     };
+
+    @Before
+    public void testInit() {
+        // Wait for progress bar to no longer be visible
+        // our activity with data has now loaded
+        idleResource = new ViewVisibilityIdleResource(activityTestRule.getActivity().findViewById(R.id.launch_detail_progressbar), GONE);
+        IdlingRegistry.getInstance().register(idleResource);
+    }
+
+    @After
+    public void testCleanup() {
+        IdlingRegistry.getInstance().unregister(idleResource);
+    }
 
     @Test
     public void launchDetailActivityTest() {
@@ -109,6 +117,34 @@ public class LaunchDetailActivityTest {
         payloads.check(matches(isDisplayed()));
         cores.check(matches(hasMinimumChildCount(1)));
         payloads.check(matches(hasMinimumChildCount(1)));
+    }
+
+    public class ViewVisibilityIdleResource implements IdlingResource {
+        private WeakReference<View> view;
+        private int desiredVisibility;
+        private ResourceCallback callback;
+
+        ViewVisibilityIdleResource(View view, int desiredVisibility) {
+            this.view = new WeakReference<>(view);
+            this.desiredVisibility = desiredVisibility;
+        }
+
+        @Override
+        public String getName() {
+            return ViewVisibilityIdleResource.class.getName();
+        }
+
+        @Override
+        public boolean isIdleNow() {
+            if (view.get().getVisibility() == desiredVisibility && callback != null)
+                callback.onTransitionToIdle();
+            return view.get().getVisibility() == desiredVisibility;
+        }
+
+        @Override
+        public void registerIdleTransitionCallback(ResourceCallback callback) {
+            this.callback = callback;
+        }
     }
 
     // Testing the external intents to YouTube or Maps would sometimes cause tests to hang

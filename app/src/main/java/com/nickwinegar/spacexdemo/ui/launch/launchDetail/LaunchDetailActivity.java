@@ -145,7 +145,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
     private void addCoreViews(List<Rocket.FirstStage.Core> cores) {
         launchFirstStageCores.removeAllViews();
         for (Rocket.FirstStage.Core core : cores) {
-            View coreItem = LayoutInflater.from(this).inflate(R.layout.core_detail, launchFirstStageCores);
+            View coreItem = LayoutInflater.from(this).inflate(R.layout.core_detail, null);
 
             TextView coreSerial = coreItem.findViewById(R.id.core_serial);
             TextView coreFlightCount = coreItem.findViewById(R.id.core_flight_count);
@@ -165,7 +165,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
     private void addPayloadViews(List<Rocket.SecondStage.Payload> payloads) {
         secondStagePayloads.removeAllViews();
         for (Rocket.SecondStage.Payload payload : payloads) {
-            View payloadItem = LayoutInflater.from(this).inflate(R.layout.payload_detail, secondStagePayloads);
+            View payloadItem = LayoutInflater.from(this).inflate(R.layout.payload_detail, null);
 
             TextView payloadName = payloadItem.findViewById(R.id.payload_name);
             TextView payloadCustomers = payloadItem.findViewById(R.id.payload_customers);
