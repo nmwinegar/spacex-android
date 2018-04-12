@@ -123,9 +123,9 @@ public class LaunchDetailActivity extends AppCompatActivity {
             playVideoFab.setVisibility(View.GONE);
         }
         Date launchTime = new Date(launch.getLaunchDateTimestamp() * 1000);
-        launchDetailHeader.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
+        launchDetailHeader.setText(new SimpleDateFormat(getString(R.string.launch_time_format), Locale.getDefault()).format(launchTime));
         if (!launchIsUpcoming) {
-            String launchSuccessMessage = launch.isLaunchSuccess() ? "Mission Success" : "Mission Failure";
+            String launchSuccessMessage = launch.isLaunchSuccess() ? getString(R.string.mission_success) : getString(R.string.mission_failure);
             launchSuccessHeader.setText(launchSuccessMessage);
         } else launchSuccessHeader.setVisibility(View.GONE);
         launchDescription.setText(launch.getDetails());
@@ -151,8 +151,8 @@ public class LaunchDetailActivity extends AppCompatActivity {
             TextView coreFlightCount = coreItem.findViewById(R.id.core_flight_count);
             TextView coreLandingSuccess = coreItem.findViewById(R.id.core_landing_success);
 
-            coreSerial.setText(String.format("Serial: %s", core.getSerial()));
-            coreFlightCount.setText(String.format(Locale.getDefault(), "Flight #%d", core.getFlightCount()));
+            coreSerial.setText(String.format(getString(R.string.core_serial_format), core.getSerial()));
+            coreFlightCount.setText(String.format(Locale.getDefault(), getString(R.string.flight_count_format), core.getFlightCount()));
             if (core.isLandingSuccess()) {
                 coreLandingSuccess.setText(R.string.landing_success);
                 coreLandingSuccess.setVisibility(View.VISIBLE);
@@ -197,7 +197,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
             Intent mapsIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Locale.getDefault(), "geo:%f, %f", viewModel.getLaunchpadLatitude(), viewModel.getLaunchpadLongitude())));
             startActivity(mapsIntent);
         } catch (Exception e) {
-            Snackbar.make(launchDetailLayout, "Unable to open launchsite location", Snackbar.LENGTH_SHORT);
+            Snackbar.make(launchDetailLayout, getString(R.string.launchsite_error_message), Snackbar.LENGTH_SHORT);
         }
     }
 

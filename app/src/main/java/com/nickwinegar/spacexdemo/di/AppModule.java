@@ -18,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class AppModule {
 
+    private static final String spaceXDataApi = "https://api.spacexdata.com/v2/";
     private SpaceXDemoApp spaceXDemoApp;
 
     public AppModule(SpaceXDemoApp spaceXDemoApp) {
@@ -41,7 +42,7 @@ public class AppModule {
     SpaceXService provideSpaceXService() {
         OkHttpClient client = getClient();
         return new Retrofit.Builder()
-                .baseUrl("https://api.spacexdata.com/v2/")
+                .baseUrl(spaceXDataApi)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().serializeNulls().create()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

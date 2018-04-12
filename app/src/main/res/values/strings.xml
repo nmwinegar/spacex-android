@@ -12,4 +12,20 @@
     <string name="previous_launches">Previous</string>
     <string name="launch_error_message">Unable to retrieve launch information.</string>
     <string name="retry_message">Retry</string>
+    <string name="launchsite_error_message">Unable to open launchsite location</string>
+    <string name="launch_network_unavailable_message">Unable to get launch, network is unavailable.</string>
+    <string name="launches_network_unavailable_message">Unable to get launches, network is unavailable.</string>
+    <string name="launchpad_network_unavailable">Unable to get launchpad details, network is unavailable.</string>
+    <string name="lower_earth_orbit">Lower Earth Orbit</string>
+    <string name="international_space_station">International Space Station</string>
+    <string name="geo_transfer_orbit">Geosynchronous Transfer Orbit</string>
+    <string name="sun_earth_lagrange">Sun-Earth Lagrange 1</string>
+    <string name="polar_orbit">Polar Orbit</string>
+    <string name="sun_synch_orbit">Sun-synchronous Orbit</string>
+    <string name="mission_success">Mission Success</string>
+    <string name="mission_failure">Mission Failure</string>
+    <string name="launch_time_format">MMMM d, y, h:mm aaa</string>
+    <string name="core_serial_format">Serial: %s</string>
+    <string name="flight_count_format">Flight #%d</string>
+    <string name="launch_retrieval_error">Error retrieving launch information.</string>
 </resources>

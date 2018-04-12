@@ -71,7 +71,7 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        launchListAdapter = new LaunchesAdapter(GlideApp.with(this), callback);
+        launchListAdapter = new LaunchesAdapter(this, GlideApp.with(this), callback);
         recyclerView.setAdapter(launchListAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }

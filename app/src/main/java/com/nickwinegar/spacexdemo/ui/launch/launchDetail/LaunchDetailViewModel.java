@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.net.UrlQuerySanitizer;
 import android.support.annotation.NonNull;
 
+import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.SpaceXDemoApp;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.model.Launch;
@@ -22,6 +23,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class LaunchDetailViewModel extends AndroidViewModel {
     private static final String highlightImageFormat = "https://i.ytimg.com/vi/%s/hqdefault.jpg";
+    private static final String youtubePattern = "www.youtube.com";
 
     @Inject public SpaceXService spaceXService;
     @Inject public ConnectionService connectionService;
@@ -49,7 +51,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
 
     public void loadPreviousLaunch(int flightNumber) {
         if (!connectionService.isConnected()) {
-            errorMessage.setValue("Unable to get launch, network is unavailable.");
+            errorMessage.setValue(getApplication().getString(R.string.launch_network_unavailable_message));
             return;
         }
 
@@ -70,7 +72,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
 
     public void loadUpcomingLaunch(int flightNumber) {
         if (!connectionService.isConnected()) {
-            errorMessage.setValue("Unable to get launch, network is unavailable.");
+            errorMessage.setValue(getApplication().getString(R.string.launch_network_unavailable_message));
             return;
         }
 
@@ -90,7 +92,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
 
     LiveData<Launchpad> getLaunchpadDetails(String launchpadId) {
         if (!connectionService.isConnected()) {
-            errorMessage.setValue("Unable to get launchpad details, network is unavailable.");
+            errorMessage.setValue(getApplication().getString(R.string.launchpad_network_unavailable));
             return launchpad;
         }
 
@@ -107,7 +109,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         if (highlightLaunch.getLinks() == null || highlightLaunch.getLinks().getVideoUrl() == null) return;
 
         String videoUrl = highlightLaunch.getLinks().getVideoUrl();
-        if (!videoUrl.isEmpty() && videoUrl.contains("www.youtube.com")) {
+        if (!videoUrl.isEmpty() && videoUrl.contains(youtubePattern)) {
             UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(videoUrl);
             String videoId = sanitizer.getValue("v");
             highlightLaunch.getLinks().setHighlightImageUrl(String.format(highlightImageFormat, videoId));
@@ -115,19 +117,19 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     }
 
     public Uri getVideoWebUri() {
-        String webVideoUriFormat = "http://www.youtube.com/watch?v=%s";
+        final String webVideoUriFormat = "http://www.youtube.com/watch?v=%s";
         return getVideoUri(webVideoUriFormat);
     }
 
     public Uri getVideoAppUri() {
-        String appVideoUriFormat = "vnd.youtube:%s";
+        final String appVideoUriFormat = "vnd.youtube:%s";
         return getVideoUri(appVideoUriFormat);
     }
 
     private Uri getVideoUri(String uriFormat) {
         if (launch.getValue() != null) {
             // Verify the launch has a video from YouTube
-            if (!launch.getValue().getLinks().getVideoUrl().isEmpty() && launch.getValue().getLinks().getVideoUrl().contains("www.youtube.com")) {
+            if (!launch.getValue().getLinks().getVideoUrl().isEmpty() && launch.getValue().getLinks().getVideoUrl().contains(youtubePattern)) {
                 UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(launch.getValue().getLinks().getVideoUrl());
                 String videoId = sanitizer.getValue("v");
                 return Uri.parse(String.format(uriFormat, videoId));
@@ -153,17 +155,17 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     String getOrbitDescription(String orbit) {
         switch (orbit) {
             case "LEO":
-                return "Lower Earth Orbit";
+                return getApplication().getString(R.string.lower_earth_orbit);
             case "ISS":
-                return "International Space Station";
+                return getApplication().getString(R.string.international_space_station);
             case "GTO":
-                return "Geosynchronous Transfer Orbit";
+                return getApplication().getString(R.string.geo_transfer_orbit);
             case "ES-L1":
-                return "Sun-Earth Lagrange 1";
+                return getApplication().getString(R.string.sun_earth_lagrange);
             case "PO":
-                return "Polar Orbit";
+                return getApplication().getString(R.string.polar_orbit);
             case "SSO":
-                return "Sun-synchronous Orbit";
+                return getApplication().getString(R.string.sun_synch_orbit);
             default:
                 return orbit;
         }

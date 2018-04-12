@@ -1,5 +1,6 @@
 package com.nickwinegar.spacexdemo.ui.launch;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import butterknife.ButterKnife;
 
 
 public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHolder> {
+    private Context context;
     private final GlideRequests glide;
     private LaunchSelectedCallback launchSelectedCallback;
     private List<Launch> launches;
@@ -36,7 +38,8 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
         }
     };
 
-    LaunchesAdapter(GlideRequests glide, LaunchSelectedCallback launchSelectedCallback) {
+    LaunchesAdapter(Context context, GlideRequests glide, LaunchSelectedCallback launchSelectedCallback) {
+        this.context = context;
         this.glide = glide;
         this.launchSelectedCallback = launchSelectedCallback;
     }
@@ -94,7 +97,7 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
                 .placeholder(R.drawable.ic_rocket)
                 .into(holder.patchView);
         Date launchTime = new Date(launch.getLaunchDateTimestamp() * 1000);
-        holder.launchTime.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
+        holder.launchTime.setText(new SimpleDateFormat(context.getString(R.string.launch_time_format), Locale.getDefault()).format(launchTime));
         holder.rocketName.setText(launch.getRocket().getName());
         String payloadDescription = getPayloadDescription(launch);
         holder.payloadDescription.setText(payloadDescription);
@@ -108,7 +111,8 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
                 builder.append(TextUtils.join("/", payload.getCustomers()));
                 builder.append(" - ");
                 builder.append(payload.getName());
-                if (i < launch.getRocket().getSecondStage().getPayloads().size() - 1) builder.append(", ");
+                if (i < launch.getRocket().getSecondStage().getPayloads().size() - 1)
+                    builder.append(", ");
             }
         }
 
