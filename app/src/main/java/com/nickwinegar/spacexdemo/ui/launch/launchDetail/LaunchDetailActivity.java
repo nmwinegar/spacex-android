@@ -3,6 +3,7 @@ package com.nickwinegar.spacexdemo.ui.launch.launchDetail;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -180,10 +181,13 @@ public class LaunchDetailActivity extends AppCompatActivity {
     }
 
     private void playHighlightVideo() {
-        try {
-            Intent appIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoAppUri());
+        PackageManager packageManager = getPackageManager();
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoAppUri());
+        if (appIntent.resolveActivity(packageManager) != null) {
+            // If YouTube app is available to handle intent, open video via App
             startActivity(appIntent);
-        } catch (ActivityNotFoundException ex) {
+        } else {
+            // If YouTube app is not available, open video via web link
             Intent webIntent = new Intent(Intent.ACTION_VIEW, viewModel.getVideoWebUri());
             startActivity(webIntent);
         }
