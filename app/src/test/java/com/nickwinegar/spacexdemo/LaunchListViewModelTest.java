@@ -127,7 +127,7 @@ public class LaunchListViewModelTest {
 
     @NonNull
     private List<Launch> getTestLaunches() {
-        Launch testLaunch = new Launch();
+        Launch testLaunch = new Launch(flightNumber, details, rocket, links, launchDateTimestamp, launchSuccess, launchSite);
         testLaunch.flightNumber = 999;
         testLaunch.launchDateTimestamp = new Date().getTime();
         List<Launch> testLaunches = new ArrayList<>();

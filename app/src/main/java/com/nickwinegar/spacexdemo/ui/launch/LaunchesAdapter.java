@@ -59,15 +59,15 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
 
                 @Override
                 public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    return launches.get(oldItemPosition).flightNumber ==
-                            newLaunches.get(newItemPosition).flightNumber;
+                    return launches.get(oldItemPosition).getFlightNumber() ==
+                            newLaunches.get(newItemPosition).getFlightNumber();
                 }
 
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
                     Launch newLaunch = newLaunches.get(newItemPosition);
                     Launch oldLaunch = launches.get(oldItemPosition);
-                    return newLaunch.flightNumber == oldLaunch.flightNumber;
+                    return newLaunch.getFlightNumber() == oldLaunch.getFlightNumber();
                 }
             });
             launches = newLaunches;
@@ -90,25 +90,25 @@ public class LaunchesAdapter extends RecyclerView.Adapter<LaunchesAdapter.ViewHo
 
         holder.itemView.setTag(launch);
         holder.itemView.setOnClickListener(launchSelectedListener);
-        glide.load(launch.links.patchUrl)
+        glide.load(launch.getLinks().getPatchUrl())
                 .placeholder(R.drawable.ic_rocket)
                 .into(holder.patchView);
-        Date launchTime = new Date(launch.launchDateTimestamp * 1000);
+        Date launchTime = new Date(launch.getLaunchDateTimestamp() * 1000);
         holder.launchTime.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
-        holder.rocketName.setText(launch.rocket.name);
+        holder.rocketName.setText(launch.getRocket().getName());
         String payloadDescription = getPayloadDescription(launch);
         holder.payloadDescription.setText(payloadDescription);
     }
 
     private String getPayloadDescription(Launch launch) {
         StringBuilder builder = new StringBuilder();
-        if (launch.rocket.secondStage.payloads.size() > 0) {
-            for (int i = 0; i < launch.rocket.secondStage.payloads.size(); i++) {
-                Rocket.SecondStage.Payload payload = launch.rocket.secondStage.payloads.get(i);
-                builder.append(TextUtils.join("/", payload.customers));
+        if (launch.getRocket().getSecondStage().getPayloads().size() > 0) {
+            for (int i = 0; i < launch.getRocket().getSecondStage().getPayloads().size(); i++) {
+                Rocket.SecondStage.Payload payload = launch.getRocket().getSecondStage().getPayloads().get(i);
+                builder.append(TextUtils.join("/", payload.getCustomers()));
                 builder.append(" - ");
-                builder.append(payload.name);
-                if (i < launch.rocket.secondStage.payloads.size() - 1) builder.append(", ");
+                builder.append(payload.getName());
+                if (i < launch.getRocket().getSecondStage().getPayloads().size() - 1) builder.append(", ");
             }
         }
 

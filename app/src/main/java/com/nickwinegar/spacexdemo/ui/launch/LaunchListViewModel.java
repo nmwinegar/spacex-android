@@ -53,7 +53,7 @@ public class LaunchListViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(launches -> {
                     // Sort launches from most recent to oldest
-                    Collections.sort(launches, (launch1, launch2) -> Long.compare(launch2.launchDateTimestamp, launch1.launchDateTimestamp));
+                    Collections.sort(launches, (launch1, launch2) -> Long.compare(launch2.getLaunchDateTimestamp(), launch1.getLaunchDateTimestamp()));
                     this.launches.setValue(launches);
                 }, error -> errorMessage.setValue("Error retrieving launch information."));
     }
@@ -69,7 +69,7 @@ public class LaunchListViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(launches -> {
                     // Sort launches ascending
-                    Collections.sort(launches, (launch1, launch2) -> Long.compare(launch1.launchDateTimestamp, launch2.launchDateTimestamp));
+                    Collections.sort(launches, (launch1, launch2) -> Long.compare(launch1.getLaunchDateTimestamp(), launch2.getLaunchDateTimestamp()));
                     this.launches.setValue(launches);
                 }, error -> errorMessage.setValue("Error retrieving launch information."));
     }

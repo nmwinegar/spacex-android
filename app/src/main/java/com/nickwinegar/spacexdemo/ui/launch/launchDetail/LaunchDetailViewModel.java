@@ -80,7 +80,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(launches -> {
                     for (Launch upcomingLaunch : launches) {
-                        if (upcomingLaunch.flightNumber == flightNumber) {
+                        if (upcomingLaunch.getFlightNumber() == flightNumber) {
                             launch.setValue(upcomingLaunch);
                             return;
                         }
@@ -104,13 +104,13 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     }
 
     private void getLaunchHighlightImage(Launch highlightLaunch) {
-        if (highlightLaunch.links == null || highlightLaunch.links.videoUrl == null) return;
+        if (highlightLaunch.getLinks() == null || highlightLaunch.getLinks().getVideoUrl() == null) return;
 
-        String videoUrl = highlightLaunch.links.videoUrl;
+        String videoUrl = highlightLaunch.getLinks().getVideoUrl();
         if (!videoUrl.isEmpty() && videoUrl.contains("www.youtube.com")) {
             UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(videoUrl);
             String videoId = sanitizer.getValue("v");
-            highlightLaunch.links.highlightImageUrl = String.format(highlightImageFormat, videoId);
+            highlightLaunch.getLinks().setHighlightImageUrl(String.format(highlightImageFormat, videoId));
         }
     }
 
@@ -127,8 +127,8 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     private Uri getVideoUri(String uriFormat) {
         if (launch.getValue() != null) {
             // Verify the launch has a video from YouTube
-            if (!launch.getValue().links.videoUrl.isEmpty() && launch.getValue().links.videoUrl.contains("www.youtube.com")) {
-                UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(launch.getValue().links.videoUrl);
+            if (!launch.getValue().getLinks().getVideoUrl().isEmpty() && launch.getValue().getLinks().getVideoUrl().contains("www.youtube.com")) {
+                UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(launch.getValue().getLinks().getVideoUrl());
                 String videoId = sanitizer.getValue("v");
                 return Uri.parse(String.format(uriFormat, videoId));
             }
@@ -137,15 +137,15 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     }
 
     double getLaunchpadLatitude() {
-        if (launchpad.getValue() != null && launchpad.getValue().launchpadLocation != null) {
-            return launchpad.getValue().launchpadLocation.latitude;
+        if (launchpad.getValue() != null && launchpad.getValue().getLaunchpadLocation() != null) {
+            return launchpad.getValue().getLaunchpadLocation().getLatitude();
         }
         throw new IllegalArgumentException("Launch does not have associated latitude");
     }
 
     double getLaunchpadLongitude() {
-        if (launchpad.getValue() != null && launchpad.getValue().launchpadLocation != null) {
-            return launchpad.getValue().launchpadLocation.longitude;
+        if (launchpad.getValue() != null && launchpad.getValue().getLaunchpadLocation() != null) {
+            return launchpad.getValue().getLaunchpadLocation().getLongitude();
         }
         throw new IllegalArgumentException("Launch does not have associated longitude");
     }

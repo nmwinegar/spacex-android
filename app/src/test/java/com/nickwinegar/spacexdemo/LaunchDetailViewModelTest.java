@@ -129,7 +129,7 @@ public class LaunchDetailViewModelTest {
     public void launchDetailViewModel_getVideoWebUriReturnsExpectedUri() {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
-        testLaunches.get(0).links.videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
+        testLaunches.get(0).getLinks().videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
         viewModel.getLaunch()
@@ -147,7 +147,7 @@ public class LaunchDetailViewModelTest {
     public void launchDetailViewModel_getVideoAppUriReturnsExpectedUri() {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
-        testLaunches.get(0).links.videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
+        testLaunches.get(0).getLinks().videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
         viewModel.getLaunch()
@@ -162,10 +162,10 @@ public class LaunchDetailViewModelTest {
     }
 
     public List<Launch> getTestLaunches() {
-        Launch testLaunch = new Launch();
+        Launch testLaunch = new Launch(flightNumber, details, rocket, links, launchDateTimestamp, launchSuccess, launchSite);
         testLaunch.flightNumber = 999;
         testLaunch.launchDateTimestamp = new Date().getTime();
-        testLaunch.links = new LaunchLinks();
+        testLaunch.links = new LaunchLinks(patchUrl, videoUrl, highlightImageUrl);
         List<Launch> testLaunches = new ArrayList<>();
         testLaunches.add(testLaunch);
         return testLaunches;

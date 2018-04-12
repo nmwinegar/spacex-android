@@ -91,7 +91,7 @@ public class LaunchDetailActivity extends AppCompatActivity {
                 .observe(this, launch -> {
                     updateLaunchInformation(launch);
                     if (launch != null) {
-                        viewModel.getLaunchpadDetails(launch.launchSite.id)
+                        viewModel.getLaunchpadDetails(launch.getLaunchSite().getId())
                                 .observe(this, this::updateLaunchpadInformation);
                     }
                 });
@@ -108,9 +108,9 @@ public class LaunchDetailActivity extends AppCompatActivity {
 
     private void updateLaunchInformation(Launch launch) {
         if (launch == null) return;
-        if (launch.links.highlightImageUrl != null && !launch.links.highlightImageUrl.isEmpty()) {
+        if (launch.getLinks().getHighlightImageUrl() != null && !launch.getLinks().getHighlightImageUrl().isEmpty()) {
             GlideApp.with(this)
-                    .load(launch.links.highlightImageUrl)
+                    .load(launch.getLinks().getHighlightImageUrl())
                     .placeholder(R.drawable.ic_rocket)
                     .centerCrop()
                     .into(highlightImageView);
@@ -122,24 +122,24 @@ public class LaunchDetailActivity extends AppCompatActivity {
                     .into(highlightImageView);
             playVideoFab.setVisibility(View.GONE);
         }
-        Date launchTime = new Date(launch.launchDateTimestamp * 1000);
+        Date launchTime = new Date(launch.getLaunchDateTimestamp() * 1000);
         launchDetailHeader.setText(new SimpleDateFormat("MMMM d, y, h:mm aaa", Locale.getDefault()).format(launchTime));
         if (!launchIsUpcoming) {
-            String launchSuccessMessage = launch.launchSuccess ? "Mission Success" : "Mission Failure";
+            String launchSuccessMessage = launch.isLaunchSuccess() ? "Mission Success" : "Mission Failure";
             launchSuccessHeader.setText(launchSuccessMessage);
         } else launchSuccessHeader.setVisibility(View.GONE);
-        launchDescription.setText(launch.details);
-        launchRocketName.setText(launch.rocket.name);
-        addCoreViews(launch.rocket.firstStage.cores);
-        addPayloadViews(launch.rocket.secondStage.payloads);
+        launchDescription.setText(launch.getDetails());
+        launchRocketName.setText(launch.getRocket().getName());
+        addCoreViews(launch.getRocket().getFirstStage().getCores());
+        addPayloadViews(launch.getRocket().getSecondStage().getPayloads());
 
         launchDetailProgressBar.setVisibility(View.GONE);
         launchDetailLayout.setVisibility(View.VISIBLE);
     }
 
     private void updateLaunchpadInformation(Launchpad launchpad) {
-        launchSiteLocation.setText(String.format("%s, %s", launchpad.launchpadLocation.name, launchpad.launchpadLocation.region));
-        launchSiteDescription.setText(launchpad.fullName);
+        launchSiteLocation.setText(String.format("%s, %s", launchpad.getLaunchpadLocation().getName(), launchpad.getLaunchpadLocation().getRegion()));
+        launchSiteDescription.setText(launchpad.getFullName());
     }
 
     private void addCoreViews(List<Rocket.FirstStage.Core> cores) {
@@ -151,9 +151,9 @@ public class LaunchDetailActivity extends AppCompatActivity {
             TextView coreFlightCount = coreItem.findViewById(R.id.core_flight_count);
             TextView coreLandingSuccess = coreItem.findViewById(R.id.core_landing_success);
 
-            coreSerial.setText(String.format("Serial: %s", core.serial));
-            coreFlightCount.setText(String.format(Locale.getDefault(), "Flight #%d", core.flightCount));
-            if (core.landingSuccess) {
+            coreSerial.setText(String.format("Serial: %s", core.getSerial()));
+            coreFlightCount.setText(String.format(Locale.getDefault(), "Flight #%d", core.getFlightCount()));
+            if (core.isLandingSuccess()) {
                 coreLandingSuccess.setText(R.string.landing_success);
                 coreLandingSuccess.setVisibility(View.VISIBLE);
             } else coreLandingSuccess.setVisibility(View.GONE);
@@ -171,9 +171,9 @@ public class LaunchDetailActivity extends AppCompatActivity {
             TextView payloadCustomers = payloadItem.findViewById(R.id.payload_customers);
             TextView payloadOrbit = payloadItem.findViewById(R.id.payload_orbit);
 
-            payloadName.setText(String.format("%s - %s", payload.payloadType, payload.name));
-            payloadCustomers.setText(TextUtils.join("/", payload.customers));
-            payloadOrbit.setText(viewModel.getOrbitDescription(payload.orbit));
+            payloadName.setText(String.format("%s - %s", payload.getPayloadType(), payload.getName()));
+            payloadCustomers.setText(TextUtils.join("/", payload.getCustomers()));
+            payloadOrbit.setText(viewModel.getOrbitDescription(payload.getOrbit()));
 
             secondStagePayloads.addView(payloadItem);
         }

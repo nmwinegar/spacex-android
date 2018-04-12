@@ -79,7 +79,7 @@ public class LaunchListActivity extends AppCompatActivity implements TabLayout.O
     private final LaunchSelectedCallback callback = launch -> {
         if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
             Intent intent = new Intent(this, LaunchDetailActivity.class);
-            intent.putExtra(LaunchDetailActivity.FLIGHT_NUMBER, launch.flightNumber);
+            intent.putExtra(LaunchDetailActivity.FLIGHT_NUMBER, launch.getFlightNumber());
             TabLayout.Tab selectedTab = tabLayout.getTabAt(tabLayout.getSelectedTabPosition());
             String tabTitle = selectedTab == null || selectedTab.getText() == null ? "" : selectedTab.getText().toString();
             boolean isUpcomingLaunch = tabTitle.equals(getResources().getString(R.string.upcoming_launches));
