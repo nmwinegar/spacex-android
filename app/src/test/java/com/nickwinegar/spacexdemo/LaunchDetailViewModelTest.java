@@ -8,6 +8,7 @@ import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.di.AppComponent;
 import com.nickwinegar.spacexdemo.model.Launch;
 import com.nickwinegar.spacexdemo.model.LaunchLinks;
+import com.nickwinegar.spacexdemo.model.LaunchSite;
 import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailViewModel;
 import com.nickwinegar.spacexdemo.util.ConnectionService;
 
@@ -83,6 +84,7 @@ public class LaunchDetailViewModelTest {
     public void launchDetailViewModel_GetLaunchErrorMessageWhenNotConnected() {
         // Given the device does not have an available network connection
         when(mockConnectionService.isConnected()).thenReturn(false);
+        when(mockApplication.getString(R.string.launch_network_unavailable_message)).thenReturn("Unable to get launch, network is unavailable.");
         viewModel.getErrorMessage().observeForever(errorObserver);
 
         // When launches are requested from the VM
@@ -129,7 +131,6 @@ public class LaunchDetailViewModelTest {
     public void launchDetailViewModel_getVideoWebUriReturnsExpectedUri() {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
-        testLaunches.get(0).getLinks().videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
         viewModel.getLaunch()
@@ -147,7 +148,6 @@ public class LaunchDetailViewModelTest {
     public void launchDetailViewModel_getVideoAppUriReturnsExpectedUri() {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
-        testLaunches.get(0).getLinks().videoUrl = "https://www.youtube.com/watch?v=ABcdEFgH";
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
         viewModel.getLaunch()
@@ -162,10 +162,7 @@ public class LaunchDetailViewModelTest {
     }
 
     public List<Launch> getTestLaunches() {
-        Launch testLaunch = new Launch(flightNumber, details, rocket, links, launchDateTimestamp, launchSuccess, launchSite);
-        testLaunch.flightNumber = 999;
-        testLaunch.launchDateTimestamp = new Date().getTime();
-        testLaunch.links = new LaunchLinks(patchUrl, videoUrl, highlightImageUrl);
+        Launch testLaunch = new Launch(999, "", null, new LaunchLinks("", "https://www.youtube.com/watch?v=ABcdEFgH", ""), new Date().getTime(), true, new LaunchSite("tst", "Test launchsite"));
         List<Launch> testLaunches = new ArrayList<>();
         testLaunches.add(testLaunch);
         return testLaunches;

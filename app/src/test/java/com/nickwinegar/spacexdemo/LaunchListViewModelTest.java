@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.di.AppComponent;
 import com.nickwinegar.spacexdemo.model.Launch;
+import com.nickwinegar.spacexdemo.model.LaunchSite;
 import com.nickwinegar.spacexdemo.ui.launch.LaunchListViewModel;
 import com.nickwinegar.spacexdemo.util.ConnectionService;
 
@@ -82,6 +83,7 @@ public class LaunchListViewModelTest {
     public void launchListViewModel_ErrorMessageWhenNotConnected() {
         // Given the device does not have an available network connection
         when(mockConnectionService.isConnected()).thenReturn(false);
+        when(mockApplication.getString(R.string.launches_network_unavailable_message)).thenReturn("Unable to get launches, network is unavailable.");
         viewModel.getErrorMessage().observeForever(errorObserver);
 
         // When launches are requested from the VM
@@ -97,6 +99,7 @@ public class LaunchListViewModelTest {
         // Given the device is connected but the Space X api call fails
         when(mockConnectionService.isConnected()).thenReturn(true);
         when(mockSpaceXService.getLaunches()).thenReturn(Observable.error(new Exception("Test Exception")));
+        when(mockApplication.getString(R.string.launch_retrieval_error)).thenReturn("Error retrieving launch information.");
         viewModel.getErrorMessage().observeForever(errorObserver);
 
         // When launches are requested from the VM
@@ -127,9 +130,7 @@ public class LaunchListViewModelTest {
 
     @NonNull
     private List<Launch> getTestLaunches() {
-        Launch testLaunch = new Launch(flightNumber, details, rocket, links, launchDateTimestamp, launchSuccess, launchSite);
-        testLaunch.flightNumber = 999;
-        testLaunch.launchDateTimestamp = new Date().getTime();
+        Launch testLaunch = new Launch(999, "", null, null, new Date().getTime(), true, new LaunchSite("tst", "Test Launchsite"));
         List<Launch> testLaunches = new ArrayList<>();
         testLaunches.add(testLaunch);
         return testLaunches;

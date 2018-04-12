@@ -65,8 +65,8 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                         getLaunchHighlightImage(newLaunch);
                         launch.setValue(newLaunch);
                     } else
-                        errorMessage.setValue("More than one launch found for that flight number");
-                }, error -> errorMessage.setValue("Error retrieving launch information."));
+                        errorMessage.setValue(getApplication().getString(R.string.multiple_launches_found));
+                }, error -> errorMessage.setValue(getApplication().getString(R.string.launch_retrieval_error)));
     }
 
 
@@ -87,7 +87,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                             return;
                         }
                     }
-                }, error -> errorMessage.setValue("Error retrieving launch information."));
+                }, error -> errorMessage.setValue(getApplication().getString(R.string.launch_retrieval_error)));
     }
 
     LiveData<Launchpad> getLaunchpadDetails(String launchpadId) {
@@ -100,7 +100,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         spaceXService.getLaunchpad(launchpadId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this.launchpad::setValue, error -> errorMessage.setValue("Error retrieving launchpad information."));
+                .subscribe(this.launchpad::setValue, error -> errorMessage.setValue(getApplication().getString(R.string.launchpad_retrieval_error)));
 
         return launchpad;
     }

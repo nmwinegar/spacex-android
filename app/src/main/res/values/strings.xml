@@ -28,4 +28,6 @@
     <string name="core_serial_format">Serial: %s</string>
     <string name="flight_count_format">Flight #%d</string>
     <string name="launch_retrieval_error">Error retrieving launch information.</string>
+    <string name="multiple_launches_found">More than one launch found for that flight number</string>
+    <string name="launchpad_retrieval_error">Error retrieving launchpad information.</string>
 </resources>
