@@ -19,18 +19,23 @@ import com.nickwinegar.spacexdemo.util.SingleLiveEvent;
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class LaunchDetailViewModel extends AndroidViewModel {
     private static final String highlightImageFormat = "https://i.ytimg.com/vi/%s/hqdefault.jpg";
     private static final String youtubePattern = "www.youtube.com";
 
-    @Inject public SpaceXService spaceXService;
-    @Inject public ConnectionService connectionService;
+    @Inject
+    public SpaceXService spaceXService;
+    @Inject
+    public ConnectionService connectionService;
 
     private final MutableLiveData<Launch> launch;
     private final MutableLiveData<Launchpad> launchpad;
     private SingleLiveEvent<String> errorMessage;
+    private final CompositeDisposable compositeDisposable;
 
     public LaunchDetailViewModel(@NonNull Application application) {
         super(application);
@@ -39,6 +44,12 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         launch = new MutableLiveData<>();
         launchpad = new MutableLiveData<>();
         errorMessage = new SingleLiveEvent<>();
+        compositeDisposable = new CompositeDisposable();
+    }
+
+    @Override
+    protected void onCleared() {
+        compositeDisposable.clear();
     }
 
     public LiveData<Launch> getLaunch() {
@@ -56,7 +67,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         }
 
         // Sort launches from most recent to oldest
-        spaceXService.getLaunch(flightNumber)
+        Disposable launchSubscription = spaceXService.getLaunch(flightNumber)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(launches -> {
@@ -67,6 +78,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                     } else
                         errorMessage.setValue(getApplication().getString(R.string.multiple_launches_found));
                 }, error -> errorMessage.setValue(getApplication().getString(R.string.launch_retrieval_error)));
+        compositeDisposable.add(launchSubscription);
     }
 
 
@@ -77,7 +89,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         }
 
         // Sort launches from most recent to oldest
-        spaceXService.getUpcomingLaunches()
+        Disposable launchSubscription = spaceXService.getUpcomingLaunches()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(launches -> {
@@ -88,6 +100,7 @@ public class LaunchDetailViewModel extends AndroidViewModel {
                         }
                     }
                 }, error -> errorMessage.setValue(getApplication().getString(R.string.launch_retrieval_error)));
+        compositeDisposable.add(launchSubscription);
     }
 
     LiveData<Launchpad> getLaunchpadDetails(String launchpadId) {
@@ -97,16 +110,18 @@ public class LaunchDetailViewModel extends AndroidViewModel {
         }
 
         // Sort launches from most recent to oldest
-        spaceXService.getLaunchpad(launchpadId)
+        Disposable launchpadSubscription = spaceXService.getLaunchpad(launchpadId)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this.launchpad::setValue, error -> errorMessage.setValue(getApplication().getString(R.string.launchpad_retrieval_error)));
+        compositeDisposable.add(launchpadSubscription);
 
         return launchpad;
     }
 
     private void getLaunchHighlightImage(Launch highlightLaunch) {
-        if (highlightLaunch.getLinks() == null || highlightLaunch.getLinks().getVideoUrl() == null) return;
+        if (highlightLaunch.getLinks() == null || highlightLaunch.getLinks().getVideoUrl() == null)
+            return;
 
         String videoUrl = highlightLaunch.getLinks().getVideoUrl();
         if (!videoUrl.isEmpty() && videoUrl.contains(youtubePattern)) {

@@ -19,6 +19,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -31,12 +33,14 @@ public class LaunchListViewModel extends AndroidViewModel {
 
     private final MutableLiveData<List<Launch>> launches;
     private SingleLiveEvent<String> errorMessage;
+    private final CompositeDisposable compositeDisposable;
 
     public LaunchListViewModel(@NonNull Application application) {
         super(application);
         ((SpaceXDemoApp) application).getAppComponent().inject(this);
         launches = new MutableLiveData<>();
         errorMessage = new SingleLiveEvent<>();
+        compositeDisposable = new CompositeDisposable();
     }
 
     public LiveData<List<Launch>> getLaunches() {
@@ -49,7 +53,7 @@ public class LaunchListViewModel extends AndroidViewModel {
             return;
         }
 
-        spaceXService.getLaunches()
+        Disposable previousLaunchSubscription = spaceXService.getLaunches()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(launches -> {
@@ -57,7 +61,7 @@ public class LaunchListViewModel extends AndroidViewModel {
                     Collections.sort(launches, (launch1, launch2) -> Long.compare(launch2.getLaunchDateTimestamp(), launch1.getLaunchDateTimestamp()));
                     this.launches.setValue(launches);
                 }, error -> errorMessage.setValue(getApplication().getString(R.string.launch_retrieval_error)));
-
+        compositeDisposable.add(previousLaunchSubscription);
     }
 
     public void loadUpcomingLaunches() {
@@ -66,7 +70,7 @@ public class LaunchListViewModel extends AndroidViewModel {
             return;
         }
 
-        spaceXService.getUpcomingLaunches()
+        Disposable upcomingLaunchSubscription = spaceXService.getUpcomingLaunches()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(launches -> {
@@ -74,9 +78,15 @@ public class LaunchListViewModel extends AndroidViewModel {
                     Collections.sort(launches, (launch1, launch2) -> Long.compare(launch1.getLaunchDateTimestamp(), launch2.getLaunchDateTimestamp()));
                     this.launches.setValue(launches);
                 }, error -> errorMessage.setValue(getApplication().getString(R.string.launch_retrieval_error)));
+        compositeDisposable.add(upcomingLaunchSubscription);
     }
 
     public SingleLiveEvent<String> getErrorMessage() {
         return errorMessage;
+    }
+
+    @Override
+    protected void onCleared() {
+        compositeDisposable.clear();
     }
 }
