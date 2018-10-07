@@ -38,14 +38,22 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LaunchDetailViewModelTest {
-    @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
-    @Mock private SpaceXDemoApp mockApplication;
-    @Mock private AppComponent mockAppComponent;
-    @Mock private ConnectionService mockConnectionService;
-    @Mock private SpaceXService mockSpaceXService;
-    @Mock private UrlQuerySanitizer mockUrlSanitizer;
-    @Mock private Observer<String> errorObserver;
-    @Mock private Observer<Launch> launchObserver;
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+    @Mock
+    private SpaceXDemoApp mockApplication;
+    @Mock
+    private AppComponent mockAppComponent;
+    @Mock
+    private ConnectionService mockConnectionService;
+    @Mock
+    private SpaceXService mockSpaceXService;
+    @Mock
+    private UrlQuerySanitizer mockUrlSanitizer;
+    @Mock
+    private Observer<String> errorObserver;
+    @Mock
+    private Observer<Launch> launchObserver;
 
     private LaunchDetailViewModel viewModel;
     private int testFlightNumber = 999;
@@ -103,6 +111,7 @@ public class LaunchDetailViewModelTest {
     public void launchDetailViewModel_GetLaunchErrorMessageWhenApiCallFails() {
         // Given the device is connected but the Space X api call fails
         when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockApplication.getString(R.string.launch_retrieval_error)).thenReturn("Error retrieving launch information.");
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.error(new Exception("Test Exception")));
         viewModel.getErrorMessage().observeForever(errorObserver);
 
