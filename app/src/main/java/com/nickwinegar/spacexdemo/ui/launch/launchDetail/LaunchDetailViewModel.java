@@ -31,6 +31,8 @@ public class LaunchDetailViewModel extends AndroidViewModel {
     public SpaceXService spaceXService;
     @Inject
     public ConnectionService connectionService;
+    @Inject
+    public UrlQuerySanitizer urlSanitizer;
 
     private final MutableLiveData<Launch> launch;
     private final MutableLiveData<Launchpad> launchpad;
@@ -125,8 +127,8 @@ public class LaunchDetailViewModel extends AndroidViewModel {
 
         String videoUrl = highlightLaunch.getLinks().getVideoUrl();
         if (!videoUrl.isEmpty() && videoUrl.contains(youtubePattern)) {
-            UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(videoUrl);
-            String videoId = sanitizer.getValue("v");
+            urlSanitizer.parseUrl(videoUrl);
+            String videoId = urlSanitizer.getValue("v");
             highlightLaunch.getLinks().setHighlightImageUrl(String.format(highlightImageFormat, videoId));
         }
     }

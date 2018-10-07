@@ -3,6 +3,7 @@ package com.nickwinegar.spacexdemo;
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.Observer;
 import android.net.Uri;
+import android.net.UrlQuerySanitizer;
 
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.di.AppComponent;
@@ -42,6 +43,7 @@ public class LaunchDetailViewModelTest {
     @Mock private AppComponent mockAppComponent;
     @Mock private ConnectionService mockConnectionService;
     @Mock private SpaceXService mockSpaceXService;
+    @Mock private UrlQuerySanitizer mockUrlSanitizer;
     @Mock private Observer<String> errorObserver;
     @Mock private Observer<Launch> launchObserver;
 
@@ -56,6 +58,7 @@ public class LaunchDetailViewModelTest {
         viewModel = new LaunchDetailViewModel(mockApplication);
         viewModel.connectionService = mockConnectionService;
         viewModel.spaceXService = mockSpaceXService;
+        viewModel.urlSanitizer = mockUrlSanitizer;
     }
 
     @Test
@@ -68,6 +71,7 @@ public class LaunchDetailViewModelTest {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
         when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockUrlSanitizer.getValue("v")).thenReturn("ABcdEFgH");
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
         viewModel.getLaunch().observeForever(launchObserver);
         viewModel.getErrorMessage().observeForever(errorObserver);
