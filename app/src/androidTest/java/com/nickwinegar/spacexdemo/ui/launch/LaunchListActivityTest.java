@@ -4,8 +4,8 @@ package com.nickwinegar.spacexdemo.ui.launch;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import com.nickwinegar.spacexdemo.R;
 import com.nickwinegar.spacexdemo.ui.launch.launchDetail.LaunchDetailActivity;
@@ -33,7 +33,7 @@ public class LaunchListActivityTest {
     public IntentsTestRule<LaunchListActivity> activityTestRule = new IntentsTestRule<>(LaunchListActivity.class);
 
     @Test
-    public void launchListActivityTest() throws InterruptedException {
+    public void launchListActivityTest() {
         // Launch list displays on activity start
         ViewInteraction recyclerView = onView(withId(R.id.launch_list));
         recyclerView.check(matches(isDisplayed()));
@@ -41,7 +41,7 @@ public class LaunchListActivityTest {
     }
 
     @Test
-    public void launchDetailActivityOnClick() throws InterruptedException {
+    public void launchDetailActivityOnClick() {
         // Click an item in the recyclerView to launch detail view
         onView(withId(R.id.launch_list)).perform(RecyclerViewActions.actionOnItemAtPosition(2, click()));
 
