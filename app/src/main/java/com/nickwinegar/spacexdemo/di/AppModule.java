@@ -1,5 +1,7 @@
 package com.nickwinegar.spacexdemo.di;
 
+import android.net.UrlQuerySanitizer;
+
 import com.google.gson.GsonBuilder;
 import com.nickwinegar.spacexdemo.SpaceXDemoApp;
 import com.nickwinegar.spacexdemo.api.SpaceXService;
@@ -48,6 +50,12 @@ public class AppModule {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(SpaceXService.class);
+    }
+
+    @Singleton
+    @Provides
+    UrlQuerySanitizer providesUrlSanitizer() {
+        return new UrlQuerySanitizer();
     }
 
     // Launch details rarely change. Cache responses to reduce network requests

@@ -3,6 +3,7 @@ package com.nickwinegar.spacexdemo;
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.Observer;
 import android.net.Uri;
+import android.net.UrlQuerySanitizer;
 
 import com.nickwinegar.spacexdemo.api.SpaceXService;
 import com.nickwinegar.spacexdemo.di.AppComponent;
@@ -37,13 +38,22 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LaunchDetailViewModelTest {
-    @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
-    @Mock private SpaceXDemoApp mockApplication;
-    @Mock private AppComponent mockAppComponent;
-    @Mock private ConnectionService mockConnectionService;
-    @Mock private SpaceXService mockSpaceXService;
-    @Mock private Observer<String> errorObserver;
-    @Mock private Observer<Launch> launchObserver;
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+    @Mock
+    private SpaceXDemoApp mockApplication;
+    @Mock
+    private AppComponent mockAppComponent;
+    @Mock
+    private ConnectionService mockConnectionService;
+    @Mock
+    private SpaceXService mockSpaceXService;
+    @Mock
+    private UrlQuerySanitizer mockUrlSanitizer;
+    @Mock
+    private Observer<String> errorObserver;
+    @Mock
+    private Observer<Launch> launchObserver;
 
     private LaunchDetailViewModel viewModel;
     private int testFlightNumber = 999;
@@ -56,6 +66,7 @@ public class LaunchDetailViewModelTest {
         viewModel = new LaunchDetailViewModel(mockApplication);
         viewModel.connectionService = mockConnectionService;
         viewModel.spaceXService = mockSpaceXService;
+        viewModel.urlSanitizer = mockUrlSanitizer;
     }
 
     @Test
@@ -68,6 +79,7 @@ public class LaunchDetailViewModelTest {
         // Given the device is connected and Space X API call succeeds
         List<Launch> testLaunches = getTestLaunches();
         when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockUrlSanitizer.getValue("v")).thenReturn("ABcdEFgH");
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.just(testLaunches));
         viewModel.getLaunch().observeForever(launchObserver);
         viewModel.getErrorMessage().observeForever(errorObserver);
@@ -99,6 +111,7 @@ public class LaunchDetailViewModelTest {
     public void launchDetailViewModel_GetLaunchErrorMessageWhenApiCallFails() {
         // Given the device is connected but the Space X api call fails
         when(mockConnectionService.isConnected()).thenReturn(true);
+        when(mockApplication.getString(R.string.launch_retrieval_error)).thenReturn("Error retrieving launch information.");
         when(mockSpaceXService.getLaunch(testFlightNumber)).thenReturn(Observable.error(new Exception("Test Exception")));
         viewModel.getErrorMessage().observeForever(errorObserver);
 
