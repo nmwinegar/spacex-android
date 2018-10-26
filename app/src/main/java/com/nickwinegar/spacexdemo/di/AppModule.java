@@ -55,7 +55,9 @@ public class AppModule {
     @Singleton
     @Provides
     UrlQuerySanitizer providesUrlSanitizer() {
-        return new UrlQuerySanitizer();
+        UrlQuerySanitizer querySanitizer = new UrlQuerySanitizer();
+        querySanitizer.setAllowUnregisteredParamaters(true);
+        return querySanitizer;
     }
 
     // Launch details rarely change. Cache responses to reduce network requests
